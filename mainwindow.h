@@ -22,6 +22,7 @@ public:
 private slots:
     void CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> actionMap);
     void AddClick(bool flag);
+    void DelClick();
     void MatchClick();
     void RecogClick();
     void ItemActivated( int row,int col);

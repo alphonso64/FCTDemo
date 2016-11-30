@@ -14,18 +14,17 @@ class CusViewFinder :public QCameraViewfinder
 
 public:
 	CusViewFinder();
-
     void enableRect();
     void disableRect();
     void setActionMapContent(int key,QString value);
-
+    void removeRectMapContent(int key);
+    QMap<int, CusRect> recMap;
+    QMap<int, QString> actionMap;
 signals:
     void ListChanged(QMap<int, CusRect> recMap,QMap<int, QString> actionMap);
 
-protected:
 
-    QMap<int, CusRect> recMap;
-    QMap<int, QString> actionMap;
+protected:
 	int mapIndex;
 	bool startflag;
 	bool drawflag;
@@ -36,9 +35,5 @@ protected:
 	void mousePressEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);
 	void mouseMoveEvent(QMouseEvent *event);
-
-
-
-
 };
 

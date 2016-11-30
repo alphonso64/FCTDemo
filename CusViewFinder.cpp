@@ -39,8 +39,8 @@ void CusViewFinder::paintEvent(QPaintEvent *e)
 	{
 		iter.next(); 
 		CusRect rect = iter.value();
-		QRect rec = rect.getRect(this->width(), this->height());
-		p.drawRect(rec);
+        QRect rec = rect.getRect(this->width(), this->height());
+        p.drawRect(rec);
         p.setPen(QPen(Qt::blue, 1));
         p.drawText(rec.topLeft(), QString::number(iter.key()));
         p.setPen(QPen(Qt::red, 1));
@@ -101,4 +101,17 @@ void CusViewFinder::setActionMapContent(int key, QString value)
         actionMap.remove(key);
         actionMap.insert(key,value);
     }
+}
+
+void CusViewFinder::removeRectMapContent(int key)
+{
+    if(actionMap.contains(key))
+    {
+        actionMap.remove(key);
+    }
+    if(recMap.contains(key))
+    {
+        recMap.remove(key);
+    }
+    emit ListChanged(recMap,actionMap);
 }
