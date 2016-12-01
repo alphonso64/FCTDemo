@@ -45,7 +45,8 @@ private:
 	CusViewFinder *viewfinder;
     QCameraImageCapture *imageCapture;
     CNN *cnn;
-    vector<Mat> temps;
+    QMap<QString,vector<Mat>> temps;
+//    vector<Mat> temps;
 };
 
 #endif // MAINWINDOW_H

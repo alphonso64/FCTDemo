@@ -16,7 +16,7 @@ double mul_tempRoi(Mat img, vector<Mat> temps, int MatchMethod);
 double find_flaw(Mat img, Mat temp, int MatchMethod);
 void detect_color(Mat img,double* color);
 double humatch(Mat img,Mat temp);
-vector<Mat> make_temps(char* name);
+vector<Mat> make_temps(const char* name);
 void m_resize(Mat src, Mat &dst, int cols, int rows);//Ë«ÏßÐÔ²åÖµ
 
 #endif

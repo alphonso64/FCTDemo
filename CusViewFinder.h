@@ -17,9 +17,11 @@ public:
     void enableRect();
     void disableRect();
     void setActionMapContent(int key,QString value);
+    void setTempsMapContent(int key,QString value);
     void removeRectMapContent(int key);
     QMap<int, CusRect> recMap;
     QMap<int, QString> actionMap;
+    QMap<int, QString> tempMap;
 signals:
     void ListChanged(QMap<int, CusRect> recMap,QMap<int, QString> actionMap);
 

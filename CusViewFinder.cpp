@@ -5,6 +5,7 @@ CusViewFinder::CusViewFinder() :QCameraViewfinder()
 {
     recMap.clear();
     actionMap.clear();
+    tempMap.clear();
 	mapIndex = 1;
 	startflag = false;
     drawflag = false;
@@ -69,7 +70,8 @@ void CusViewFinder::mouseReleaseEvent(QMouseEvent *event)
 		if (startPoint != endPoint)
 		{
             recMap.insert(mapIndex, CusRect(startPoint, endPoint, this->width(), this->height()));
-            actionMap.insert(mapIndex++, " ");
+            tempMap.insert(mapIndex," ");
+            actionMap.insert(mapIndex++, " ");   
             emit ListChanged(recMap,actionMap);
 			update();
 		}
@@ -103,6 +105,15 @@ void CusViewFinder::setActionMapContent(int key, QString value)
     }
 }
 
+void CusViewFinder::setTempsMapContent(int key, QString value)
+{
+    if(tempMap.contains(key))
+    {
+        tempMap.remove(key);
+        tempMap.insert(key,value);
+    }
+}
+
 void CusViewFinder::removeRectMapContent(int key)
 {
     if(actionMap.contains(key))
@@ -112,6 +123,10 @@ void CusViewFinder::removeRectMapContent(int key)
     if(recMap.contains(key))
     {
         recMap.remove(key);
+    }
+    if(tempMap.contains(key))
+    {
+        tempMap.remove(key);
     }
     emit ListChanged(recMap,actionMap);
 }

@@ -3,6 +3,8 @@
 #include <QTextCodec>
 #include <QCameraInfo>
 #include "util.h"
+#include <QFileDialog>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,16 +33,29 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ui->tableWidget->setRowCount(0);    
     ui->tableWidget->setColumnCount(2);  
+    ui->tableWidget_2->setRowCount(0);
+    ui->tableWidget_2->setColumnCount(2);
 
     QHeaderView* headerView = ui->tableWidget->verticalHeader();
     headerView->setHidden(true);
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+
+    headerView = ui->tableWidget_2->verticalHeader();
+    headerView->setHidden(true);
+    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
 
     QStringList header;
     header<<"序号"<<"动作";
     ui->tableWidget->setHorizontalHeaderLabels(header);
 	ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    QStringList header_;
+    header_<<"序号"<<"结果";
+    ui->tableWidget_2->setHorizontalHeaderLabels(header_);
+    ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
+    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+
     ui->addButton->setCheckable(true);
 
     initNet();
@@ -53,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->delButton, SIGNAL(clicked()), this, SLOT(DelClick()));
     connect(ui->captureButton, SIGNAL(clicked()), this, SLOT(captureImage()));
     connect(imageCapture, SIGNAL(imageCaptured(int,QImage)), this,SLOT(saveImage(int,QImage)));
+
 }
 
 MainWindow::~MainWindow()
@@ -76,7 +92,8 @@ void  MainWindow::CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> a
         QString action = actionMap.value(iter.key());
         if(action.compare(MATCH_PROC)==0)
         {
-            item  = new QTableWidgetItem(MATCH_PROC_TEXT);
+            QString temp = viewfinder->tempMap.value(iter.key());
+            QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+temp+")");
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget->setItem(cnt++, 1, item);
         }else if(action.compare(RECOG_PROC)==0)
@@ -120,14 +137,24 @@ void MainWindow::MatchClick()
     int row = ui->tableWidget->currentRow();
     if(row > -1)
     {
-        QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT);
-        item->setTextAlignment(Qt::AlignCenter);
-        ui->tableWidget->setItem(row, 1, item);
+        QString path = QFileDialog::getOpenFileName(this, tr("Open Image"), "D://test//temps", tr("Image Files(*.jpg)"));
+        if(path.length() == 0) {
+            return;
+        }else{
+            QFileInfo fileInfo(path);
 
-        int key = ui->tableWidget->item(row,0)->text().toInt();
-        viewfinder->setActionMapContent(key,MATCH_PROC);
+            if(temps.contains(fileInfo.fileName()))
+            {
+                QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+fileInfo.fileName()+")");
+                item->setTextAlignment(Qt::AlignCenter);
+                ui->tableWidget->setItem(row, 1, item);
+
+                int key = ui->tableWidget->item(row,0)->text().toInt();
+                viewfinder->setActionMapContent(key,MATCH_PROC);
+                viewfinder->setTempsMapContent(key,fileInfo.fileName());
+            }
+        }
     }
-
 }
 
 void MainWindow::RecogClick()
@@ -150,31 +177,44 @@ void MainWindow::captureImage()
 
 void MainWindow::saveImage(int index,QImage image )
 {
+    ui->tableWidget_2->clearContents();
+    ui->tableWidget_2->setRowCount(0);
+
     QMapIterator<int, CusRect> iter(viewfinder->recMap);
+    int cnt = 0;
     while (iter.hasNext())
     {
         iter.next();
-//        CusRect rect = iter.value();
-//        QString action = viewfinder->actionMap.value(iter.key());
-//        if(action.compare(MATCH_PROC) == 0){
-//            QRect rec = rect.getRect(image.width(), image.height());
-//            QImage temp = image.copy(rec);
-//            QString pre = QString::number(iter.key());
-//            temp.save("D:\\test\\"+pre+" "+MATCH_PROC_TEXT+".jpg");
-//        }else if(action.compare(RECOG_PROC) == 0){
-//            QRect rec = rect.getRect(image.width(), image.height());
-//            QImage temp = image.copy(rec);
-//            QString pre = QString::number(iter.key());
-//            temp.save("D:\\test\\"+pre+" "+RECOG_PROC_TEXT+".jpg");
-//        }
-
         CusRect rect = iter.value();
-        QRect rec = rect.getRect(image.width(), image.height());
-        QImage temp = image.copy(rec);
-        cv::Mat mat = QImage2cvMat(temp);
-        cv::cvtColor(mat, mat, CV_RGBA2GRAY);
-        int predict = cnn->test_frame(mat);
-        qDebug()<<"out:"<<predict;
+        QString action = viewfinder->actionMap.value(iter.key());
+        if(action.compare(MATCH_PROC) == 0){
+            ui->tableWidget_2->setRowCount(ui->tableWidget_2->rowCount()+1);
+            QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
+            item->setTextAlignment(Qt::AlignCenter);
+            ui->tableWidget_2->setItem(cnt, 0, item);
+
+            item  = new QTableWidgetItem(action);
+            item->setTextAlignment(Qt::AlignCenter);
+            ui->tableWidget_2->setItem(cnt++, 1, item);
+
+        }else if(action.compare(RECOG_PROC) == 0){
+            ui->tableWidget_2->setRowCount(ui->tableWidget_2->rowCount()+1);
+            QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
+            item->setTextAlignment(Qt::AlignCenter);
+            ui->tableWidget_2->setItem(cnt, 0, item);
+
+            item  = new QTableWidgetItem(action);
+            item->setTextAlignment(Qt::AlignCenter);
+            ui->tableWidget_2->setItem(cnt++, 1, item);
+        }
+
+//        CusRect rect = iter.value();
+//        QRect rec = rect.getRect(image.width(), image.height());
+//        QImage temp = image.copy(rec);
+//        cv::Mat mat = QImage2cvMat(temp);
+//        cv::cvtColor(mat, mat, CV_RGBA2GRAY);
+//        int predict = cnn->test_frame(mat);
+//        qDebug()<<"out:"<<predict;
 
 //            CusRect rect = iter.value();
 //            QRect rec = rect.getRect(image.width(), image.height());
@@ -188,6 +228,8 @@ void MainWindow::saveImage(int index,QImage image )
 
     }
 //    image.save("D:\\test\\raw.jpg");
+
+
 }
 
 void MainWindow::initNet()
@@ -202,13 +244,22 @@ void MainWindow::initNet()
     builder.addLayer(layer.buildOutputLayer(10));
     cnn = new CNN(builder, 10);// biuder batchsize
     cnn->load_weight();
-    int predict = cnn->test_pic("C:\\1.jpg");
-    qDebug()<<"test"<<predict;
 }
 
 void MainWindow::initTemp()
 {
-    temps=make_temps("C:\\eco2.jpg");
+    QDir dir("D:\\test\\temps");
+    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    dir.setSorting(QDir::Size | QDir::Reversed);
+
+    QFileInfoList list = dir.entryInfoList();
+        for (int i = 0; i < list.size(); ++i) {
+        QFileInfo fileInfo = list.at(i);
+
+        vector<Mat> temp = make_temps(fileInfo.filePath().toStdString().c_str());
+        temps.insert(fileInfo.fileName(),temp);
+    }
+    qDebug()<<temps.size();
 }
 
 

@@ -748,7 +748,7 @@ void CNN::load_weight()
 	int i,j,k,l;
 	FILE *fp;
 	//load the first conv layer weight and bias
-     if((fp=fopen("C:\\conv_layer1_kernel.txt","rt"))==NULL)
+     if((fp=fopen("D:\\test\\conv_layer1_kernel.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv1_w\n");
 	 }
@@ -761,7 +761,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("C:\\conv_layer1_bias.txt","rt"))==NULL)
+     if((fp=fopen("D:\\test\\conv_layer1_bias.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv1_b\n");
 	 }
@@ -775,7 +775,7 @@ void CNN::load_weight()
 	  iter++;iter++;
       m_kernel=(*iter).kernel;
 	  m_bias=(*iter).bias;
-       if((fp=fopen("C:\\conv_layer2_kernel.txt","rt"))==NULL)
+       if((fp=fopen("D:\\test\\conv_layer2_kernel.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv2_w\n");
 	 }
@@ -790,7 +790,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("C:\\conv_layer2_bias.txt","rt"))==NULL)
+     if((fp=fopen("D:\\test\\conv_layer2_bias.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv2_b\n");
 	 }
@@ -804,7 +804,7 @@ void CNN::load_weight()
 	  iter++;iter++;
       m_kernel=(*iter).kernel;
 	  m_bias=(*iter).bias;
-       if((fp=fopen("C:\\conv_layer3_kernel.txt","rt"))==NULL)
+       if((fp=fopen("D:\\test\\conv_layer3_kernel.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv3_w\n");
 	 }
@@ -819,7 +819,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("C:\\conv_layer3_bias.txt","rt"))==NULL)
+     if((fp=fopen("D:\\test\\conv_layer3_bias.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv3_b\n");
 	 }

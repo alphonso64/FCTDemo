@@ -419,7 +419,7 @@ double humatch(Mat img,Mat temp)
 	return result;
 }
 
-vector<Mat> make_temps(char* name){
+vector<Mat> make_temps(const char* name){
 	vector<Mat> temps;
 	Mat img,scale_image,scale_angle_image;
 	img=imread(name,0);

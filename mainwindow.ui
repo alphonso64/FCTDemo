@@ -34,17 +34,23 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="3">
+       <layout class="QVBoxLayout" name="verticalLayout_7" stretch="1,1">
+        <property name="spacing">
+         <number>1</number>
+        </property>
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="3,1">
           <property name="spacing">
            <number>3</number>
           </property>
           <property name="bottomMargin">
-           <number>70</number>
+           <number>5</number>
           </property>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <item>
              <widget class="QTableWidget" name="tableWidget"/>
             </item>
@@ -52,6 +58,9 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>0</number>
+            </property>
             <property name="bottomMargin">
              <number>0</number>
             </property>
@@ -97,7 +106,7 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>110</y>
+                 <y>100</y>
                  <width>71</width>
                  <height>41</height>
                 </rect>
@@ -115,7 +124,7 @@
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>160</y>
+                 <y>150</y>
                  <width>71</width>
                  <height>41</height>
                 </rect>
@@ -129,11 +138,42 @@
                 <string>匹配</string>
                </property>
               </widget>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="3,1">
+          <property name="spacing">
+           <number>3</number>
+          </property>
+          <property name="topMargin">
+           <number>5</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QTableWidget" name="tableWidget_2"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_2">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QWidget" name="widget" native="true">
               <widget class="QPushButton" name="captureButton">
                <property name="geometry">
                 <rect>
                  <x>0</x>
-                 <y>220</y>
+                 <y>0</y>
                  <width>71</width>
                  <height>41</height>
                 </rect>
