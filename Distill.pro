@@ -22,7 +22,8 @@ SOURCES += main.cpp\
     CNN.cpp \
     Layer.cpp \
     util.cpp \
-    util_liang.cpp
+    util_liang.cpp \
+    paintlabel.cpp
 
 HEADERS  += mainwindow.h \
     CusRect.h \
@@ -31,7 +32,8 @@ HEADERS  += mainwindow.h \
     CNN.h \
     Layer.h \
     util.h \
-    util_liang.h
+    util_liang.h \
+    paintlabel.h
 
 FORMS    += mainwindow.ui
 

@@ -22,15 +22,47 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="5,3">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="2,1,1">
       <item>
-       <layout class="QVBoxLayout" name="viewfinderLayout">
+       <layout class="QVBoxLayout" name="viewfinderLayout_" stretch="2,1">
         <property name="topMargin">
          <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>70</number>
+         <number>0</number>
         </property>
+        <item>
+         <layout class="QVBoxLayout" name="viewfinderLayout"/>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QWidget" name="widget_3" native="true"/>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_5" stretch="1,2">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="PaintLabel" name="label">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QWidget" name="widget_4" native="true"/>
+          </item>
+         </layout>
+        </item>
        </layout>
       </item>
       <item>
@@ -184,7 +216,7 @@
                 </font>
                </property>
                <property name="text">
-                <string>截图</string>
+                <string>检测</string>
                </property>
               </widget>
              </widget>
@@ -201,6 +233,13 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>PaintLabel</class>
+   <extends>QLabel</extends>
+   <header>paintlabel.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

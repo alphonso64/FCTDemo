@@ -5,12 +5,14 @@
 #include "util.h"
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPixmap>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setWindowTitle("FCTDEMO");
 
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
@@ -35,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setColumnCount(2);  
     ui->tableWidget_2->setRowCount(0);
     ui->tableWidget_2->setColumnCount(2);
+
+//    ui->label->setScaledContents(true);
 
     QHeaderView* headerView = ui->tableWidget->verticalHeader();
     headerView->setHidden(true);
@@ -182,10 +186,19 @@ void MainWindow::saveImage(int index,QImage image )
 
     QMapIterator<int, CusRect> iter(viewfinder->recMap);
     int cnt = 0;
+
+    ui->label->recMap = viewfinder->recMap;
+    ui->label->setPixmap(QPixmap::fromImage(image.scaled(ui->label->width(),ui->label->height())));
+
     while (iter.hasNext())
     {
         iter.next();
-        CusRect rect = iter.value();
+        CusRect rect = iter.value();\
+        QRect rec = rect.getRect(image.width(), image.height());
+        QImage temp = image.copy(rec);
+        cv::Mat mat = QImage2cvMat(temp);
+      //  imwrite("D:\\test\\temps\\temp.jpg",mat);
+
         QString action = viewfinder->actionMap.value(iter.key());
         if(action.compare(MATCH_PROC) == 0){
             ui->tableWidget_2->setRowCount(ui->tableWidget_2->rowCount()+1);
@@ -193,9 +206,21 @@ void MainWindow::saveImage(int index,QImage image )
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget_2->setItem(cnt, 0, item);
 
-            item  = new QTableWidgetItem(action);
+            cv::cvtColor(mat, mat, CV_RGBA2BGR);
+            double res = mul_tempRoi(mat,temps.value(viewfinder->tempMap.value(iter.key())),1);
+//            qDebug()<<"out:"<<res;
+
+            if(res>0.5f)
+            {
+                item  = new QTableWidgetItem(QString("off"));
+            }else if(res>-0.1f){
+                item  = new QTableWidgetItem("on");
+            }else{
+                item  = new QTableWidgetItem("error");
+            }
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget_2->setItem(cnt++, 1, item);
+
 
         }else if(action.compare(RECOG_PROC) == 0){
             ui->tableWidget_2->setRowCount(ui->tableWidget_2->rowCount()+1);
@@ -203,18 +228,17 @@ void MainWindow::saveImage(int index,QImage image )
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget_2->setItem(cnt, 0, item);
 
-            item  = new QTableWidgetItem(action);
+            cv::cvtColor(mat, mat, CV_RGBA2GRAY);
+            int predict = cnn->test_frame(mat);
+//            qDebug()<<"out:"<<predict;
+
+            item  = new QTableWidgetItem(QString::number(predict));
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget_2->setItem(cnt++, 1, item);
         }
 
-//        CusRect rect = iter.value();
-//        QRect rec = rect.getRect(image.width(), image.height());
-//        QImage temp = image.copy(rec);
-//        cv::Mat mat = QImage2cvMat(temp);
-//        cv::cvtColor(mat, mat, CV_RGBA2GRAY);
-//        int predict = cnn->test_frame(mat);
-//        qDebug()<<"out:"<<predict;
+
+
 
 //            CusRect rect = iter.value();
 //            QRect rec = rect.getRect(image.width(), image.height());
