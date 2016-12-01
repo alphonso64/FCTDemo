@@ -18,11 +18,24 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     CusRect.cpp \
     CusViewFinder.cpp \
-    imageproc.cpp
+    imageproc.cpp \
+    CNN.cpp \
+    Layer.cpp \
+    util.cpp \
+    util_liang.cpp
 
 HEADERS  += mainwindow.h \
     CusRect.h \
     CusViewFinder.h \
-    imageproc.h
+    imageproc.h \
+    CNN.h \
+    Layer.h \
+    util.h \
+    util_liang.h
 
 FORMS    += mainwindow.ui
+
+INCLUDEPATH+=C:/opencv/build/include/opencv \
+                    C:/opencv/build/include/opencv2 \
+                   C:/opencv/build/include
+LIBS+=C:/opencv/build/x64/vc12/lib/opencv_world310d.lib

@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QTextCodec>
+#include <QCameraInfo>
+#include "util.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -10,7 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
-    camera=new QCamera(this);
+    foreach (const QCameraInfo &cameraInfo, QCameraInfo::availableCameras()) {
+        if(cameraInfo.description().compare("H264 USB Camera")==0)
+        {
+            camera=new QCamera(cameraInfo);
+        }
+    }
+
     viewfinder=new CusViewFinder();
     viewfinder->setAspectRatioMode(Qt::IgnoreAspectRatio);
     QCameraViewfinderSettings settings;
@@ -33,8 +41,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setHorizontalHeaderLabels(header);
 	ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-
     ui->addButton->setCheckable(true);
+
+    initNet();
+    initTemp();
 
     connect(viewfinder, SIGNAL(ListChanged(QMap<int, CusRect>,QMap<int, QString>)), this, SLOT(CusRectListChanged(QMap<int, CusRect>,QMap<int, QString>)));
     connect(ui->addButton, SIGNAL(toggled(bool)), this, SLOT(AddClick(bool)));
@@ -144,23 +154,61 @@ void MainWindow::saveImage(int index,QImage image )
     while (iter.hasNext())
     {
         iter.next();
+//        CusRect rect = iter.value();
+//        QString action = viewfinder->actionMap.value(iter.key());
+//        if(action.compare(MATCH_PROC) == 0){
+//            QRect rec = rect.getRect(image.width(), image.height());
+//            QImage temp = image.copy(rec);
+//            QString pre = QString::number(iter.key());
+//            temp.save("D:\\test\\"+pre+" "+MATCH_PROC_TEXT+".jpg");
+//        }else if(action.compare(RECOG_PROC) == 0){
+//            QRect rec = rect.getRect(image.width(), image.height());
+//            QImage temp = image.copy(rec);
+//            QString pre = QString::number(iter.key());
+//            temp.save("D:\\test\\"+pre+" "+RECOG_PROC_TEXT+".jpg");
+//        }
+
         CusRect rect = iter.value();
-        QString action = viewfinder->actionMap.value(iter.key());
-//        qDebug()<<iter.key()<<action;
-        if(action.compare(MATCH_PROC) == 0){
-            QRect rec = rect.getRect(image.width(), image.height());
-            QImage temp = image.copy(rec);
-            QString pre = QString::number(iter.key());
-            temp.save("D:\\test\\"+pre+" "+MATCH_PROC_TEXT+".jpg");
-        }else if(action.compare(RECOG_PROC) == 0){
-            QRect rec = rect.getRect(image.width(), image.height());
-            QImage temp = image.copy(rec);
-            QString pre = QString::number(iter.key());
-            temp.save("D:\\test\\"+pre+" "+RECOG_PROC_TEXT+".jpg");
-        }
+        QRect rec = rect.getRect(image.width(), image.height());
+        QImage temp = image.copy(rec);
+        cv::Mat mat = QImage2cvMat(temp);
+        cv::cvtColor(mat, mat, CV_RGBA2GRAY);
+        int predict = cnn->test_frame(mat);
+        qDebug()<<"out:"<<predict;
+
+//            CusRect rect = iter.value();
+//            QRect rec = rect.getRect(image.width(), image.height());
+//            QImage temp = image.copy(rec);
+//            cv::Mat mat = QImage2cvMat(temp);
+//            cv::cvtColor(mat, mat, CV_RGBA2BGR);
+//            imwrite("C:\\eco2.jpg",mat);
+//            double res = mul_tempRoi(mat,temps,1);
+//            qDebug()<<"out:"<<res;
+
 
     }
 //    image.save("D:\\test\\raw.jpg");
+}
+
+void MainWindow::initNet()
+{
+    LayerBuilder builder;
+    Layer layer;
+    builder.addLayer(layer.buildInputLayer(size::size(Len,Len)));
+    builder.addLayer(layer.buildConvLayer(6, size::size(5, 5)));
+    builder.addLayer(layer.buildSampLayer( size::size(2, 2)));
+    builder.addLayer(layer.buildConvLayer(12, size::size(5, 5)));
+    builder.addLayer(layer.buildSampLayer( size::size(2, 2)));
+    builder.addLayer(layer.buildOutputLayer(10));
+    cnn = new CNN(builder, 10);// biuder batchsize
+    cnn->load_weight();
+    int predict = cnn->test_pic("C:\\1.jpg");
+    qDebug()<<"test"<<predict;
+}
+
+void MainWindow::initTemp()
+{
+    temps=make_temps("C:\\eco2.jpg");
 }
 
 

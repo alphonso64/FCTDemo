@@ -7,6 +7,14 @@
 #include <QCameraImageCapture>
 #include "CusViewFinder.h"
 #include "imageproc.h"
+#include "CNN.h"
+#include "Layer.h"
+#include "util_liang.h"
+#include <vector>
+
+using namespace cv;
+using namespace std;
+
 namespace Ui {
 class MainWindow;
 }
@@ -30,10 +38,14 @@ private slots:
     void saveImage(int,QImage);
 
 private:
+    void initNet();
+    void initTemp();
     Ui::MainWindow *ui;
     QCamera *camera;
 	CusViewFinder *viewfinder;
     QCameraImageCapture *imageCapture;
+    CNN *cnn;
+    vector<Mat> temps;
 };
 
 #endif // MAINWINDOW_H
