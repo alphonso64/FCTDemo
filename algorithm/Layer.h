@@ -2,7 +2,7 @@
 #define LAYER_H
 #include "iostream"
 #include "vector"
-#include "util.h"
+#include "CNN_util.h"
 using namespace std;
 
 class size

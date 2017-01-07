@@ -6,11 +6,7 @@
 #include "fstream"
 #include "time.h"
 #include "Layer.h"
-#include <QImage>
-#include <QDebug>
-#include <opencv2/opencv.hpp>
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/imgproc/imgproc.hpp"
+
 using namespace std;
 class size;
 #define SIGMOID(x) (1/(1+exp(-x)))
@@ -46,5 +42,4 @@ void ArrayMultiply(double** matrix, double val, int m, int n);// array multiply 
 void setValue(double** maps, double** sum, int m, int n);
 int findIndex(double*** p);
 int findIndex(double* p);
-cv::Mat QImage2cvMat(QImage image);
 #endif

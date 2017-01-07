@@ -1,5 +1,7 @@
-#include "CusRect.h"
-
+﻿#include "CusRect.h"
+CusRect::CusRect()
+{
+}
 
 CusRect::CusRect(float x1, float y1, float x2, float y2)
 {
@@ -37,4 +39,14 @@ QRect CusRect::getRect(int width, int height)
 	QPoint start(x1*width, y1*height);
 	QPoint end(x2*width, y2*height);
 	return QRect(start, end);
+}
+
+CusReplyData::~CusReplyData()
+{
+
+}
+
+CusReplyData::CusReplyData()
+{
+
 }

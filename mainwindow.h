@@ -1,19 +1,18 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QCamera>
-#include <QCameraViewfinder>
-#include <QCameraImageCapture>
-#include "CusViewFinder.h"
 #include "imageproc.h"
-#include "CNN.h"
-#include "Layer.h"
-#include "util_liang.h"
+#include "tcprwworker.h"
 #include <vector>
-
-using namespace cv;
+#include <QtNetwork>
+#include "cuscamera.h"
+#include "algorithm/CNN.h"
+#include "vector"
+#include "CusRect.h"
 using namespace std;
+
+#pragma execution_character_set("utf-8")
 
 namespace Ui {
 class MainWindow;
@@ -33,20 +32,34 @@ private slots:
     void DelClick();
     void MatchClick();
     void RecogClick();
+    void detectClick();
     void ItemActivated( int row,int col);
-    void captureImage();
-    void saveImage(int,QImage);
+    void proecssBlock(int n);
+    void capimg();
+    void saveimg();
+    //void processConnection();
+    //void processText();
 
 private:
     void initNet();
     void initTemp();
+    void send2Client();
+    void tcpstartrw();
+    void replytoclient();
     Ui::MainWindow *ui;
-    QCamera *camera;
-	CusViewFinder *viewfinder;
-    QCameraImageCapture *imageCapture;
+
     CNN *cnn;
-    QMap<QString,vector<Mat>> temps;
+    QMap<QString,vector<Pic<uchar>>> temps;
+    TCPRWWorker * tcpworker;
+    QVector<CusReplyData> vect;
+    CusCamera *cuscamera;
+    QImage image;
+    QImage detetcImage;
+    //QTcpServer * listenSocket;
+    //QTcpSocket * readWriteSocket;
 //    vector<Mat> temps;
+public:
+
 };
 
 #endif // MAINWINDOW_H

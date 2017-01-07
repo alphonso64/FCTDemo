@@ -1,4 +1,4 @@
-#include "paintlabel.h"
+﻿#include "paintlabel.h"
 #include <QPainter>
 #include <QDebug>
 
@@ -22,4 +22,5 @@ void PaintLabel::paintEvent(QPaintEvent *event)
         p.drawText(rec.topLeft(), QString::number(iter.key()));
         p.setPen(QPen(Qt::red, 1));
     }
+    qDebug()<<"PaintLabel paintEvent";
 }

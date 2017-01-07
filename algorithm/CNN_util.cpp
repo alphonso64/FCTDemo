@@ -1,7 +1,7 @@
 #include "iostream"
 #include "vector"
 #include "fstream"
-#include "util.h"
+#include "CNN_util.h"
 using namespace std;
 
 int ReverseInt (int i)
@@ -428,7 +428,6 @@ int findIndex(double*** p)
 			index = i;
 		}
 	}
-    qDebug()<<"MAX:"<<Max;
 	return index;
 }
 
@@ -457,29 +456,4 @@ void setValue(double** maps, double** sum, int m, int n)
 			maps[i][j] = sum[i][j];
 		}
 	}
-}
-
-cv::Mat QImage2cvMat(QImage image)
-{
-    qDebug()<<"QImage2cvMat";
-    cv::Mat mat;
-    switch(image.format())
-    {
-    case QImage::Format_ARGB32:
-    case QImage::Format_RGB32:
-    case QImage::Format_ARGB32_Premultiplied:
-//        qDebug()<<"Format_ARGB32_Premultiplied";
-        mat = cv::Mat(image.height(), image.width(), CV_8UC4, (void*)image.constBits(), image.bytesPerLine());
-        break;
-    case QImage::Format_RGB888:
-//        qDebug()<<"Format_RGB888";
-        mat = cv::Mat(image.height(), image.width(), CV_8UC3, (void*)image.constBits(), image.bytesPerLine());
-        cv::cvtColor(mat, mat, CV_BGR2RGB);
-        break;
-    case QImage::Format_Indexed8:
-//        qDebug()<<"Format_Indexed8";
-        mat = cv::Mat(image.height(), image.width(), CV_8UC1, (void*)image.constBits(), image.bytesPerLine());
-        break;
-    }
-    return mat;
 }

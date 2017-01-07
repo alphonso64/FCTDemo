@@ -1,54 +1,63 @@
-#include "CusViewFinder.h"
+﻿#include "cuslabel.h"
 
-
-CusViewFinder::CusViewFinder() :QCameraViewfinder()
+CusLabel::CusLabel(QWidget *parent):QLabel(parent)
 {
     recMap.clear();
     actionMap.clear();
     tempMap.clear();
-	mapIndex = 1;
-	startflag = false;
+    mapIndex = 1;
+    startflag = false;
     drawflag = false;
 }
 
-void CusViewFinder::enableRect()
+CusLabel::CusLabel()
+{
+    recMap.clear();
+    actionMap.clear();
+    tempMap.clear();
+    mapIndex = 1;
+    startflag = false;
+    drawflag = false;
+}
+
+void CusLabel::enableRect()
 {
     drawflag = true;
 }
 
-void CusViewFinder::disableRect()
+void CusLabel::disableRect()
 {
     drawflag = false;
 }
 
 
-void CusViewFinder::paintEvent(QPaintEvent *e)
+void CusLabel::paintEvent(QPaintEvent *e)
 {
-	QCameraViewfinder::paintEvent(e);
+    QLabel::paintEvent(e);
     QPainter p(this);
-	p.setPen(QPen(Qt::red, 1));
+    p.setPen(QPen(Qt::red, 1));
     QMapIterator<int, CusRect> iter(recMap);
 
-	if (startflag)
-	{
-		if (startPoint != endPoint)
-		{
-			p.drawRect(QRect(startPoint, endPoint));
-		}	
-	}
-	while (iter.hasNext())
-	{
-		iter.next(); 
-		CusRect rect = iter.value();
+    if (startflag)
+    {
+        if (startPoint != endPoint)
+        {
+            p.drawRect(QRect(startPoint, endPoint));
+        }
+    }
+    while (iter.hasNext())
+    {
+        iter.next();
+        CusRect rect = iter.value();
         QRect rec = rect.getRect(this->width(), this->height());
         p.drawRect(rec);
         p.setPen(QPen(Qt::blue, 1));
         p.drawText(rec.topLeft(), QString::number(iter.key()));
         p.setPen(QPen(Qt::red, 1));
-	}
+    }
 }
 
-void CusViewFinder::mousePressEvent(QMouseEvent *event)
+void CusLabel::mousePressEvent(QMouseEvent *event)
 {
     if(drawflag)
     {
@@ -60,27 +69,27 @@ void CusViewFinder::mousePressEvent(QMouseEvent *event)
     }
 }
 
-void CusViewFinder::mouseReleaseEvent(QMouseEvent *event)
+void CusLabel::mouseReleaseEvent(QMouseEvent *event)
 {
-	if (startflag)
-	{
-		startflag = false;
-		endPoint.setX(event->x());
-		endPoint.setY(event->y());
-		if (startPoint != endPoint)
-		{
+    if (startflag)
+    {
+        startflag = false;
+        endPoint.setX(event->x());
+        endPoint.setY(event->y());
+        if (startPoint != endPoint)
+        {
             recMap.insert(mapIndex, CusRect(startPoint, endPoint, this->width(), this->height()));
             tempMap.insert(mapIndex," ");
-            actionMap.insert(mapIndex++, " ");   
+            actionMap.insert(mapIndex++, " ");
             emit ListChanged(recMap,actionMap);
-			update();
-		}
-	}
+            update();
+        }
+    }
 }
 
-void CusViewFinder::mouseMoveEvent(QMouseEvent *event){
-	int x = event->x();
-	int y = event->y();
+void CusLabel::mouseMoveEvent(QMouseEvent *event){
+    int x = event->x();
+    int y = event->y();
 
     if(drawflag)
     {
@@ -94,9 +103,10 @@ void CusViewFinder::mouseMoveEvent(QMouseEvent *event){
             }
         }
     }
+    update();
 }
 
-void CusViewFinder::setActionMapContent(int key, QString value)
+void CusLabel::setActionMapContent(int key, QString value)
 {
     if(actionMap.contains(key))
     {
@@ -105,7 +115,7 @@ void CusViewFinder::setActionMapContent(int key, QString value)
     }
 }
 
-void CusViewFinder::setTempsMapContent(int key, QString value)
+void CusLabel::setTempsMapContent(int key, QString value)
 {
     if(tempMap.contains(key))
     {
@@ -114,7 +124,7 @@ void CusViewFinder::setTempsMapContent(int key, QString value)
     }
 }
 
-void CusViewFinder::removeRectMapContent(int key)
+void CusLabel::removeRectMapContent(int key)
 {
     if(actionMap.contains(key))
     {
@@ -130,3 +140,4 @@ void CusViewFinder::removeRectMapContent(int key)
     }
     emit ListChanged(recMap,actionMap);
 }
+

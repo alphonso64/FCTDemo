@@ -1,9 +1,8 @@
 #include "CNN.h"
 #include "vector"
 #include "iostream"
-#include "opencv2/opencv.hpp"
+#include "match_util.h"
 using namespace std;
-using namespace cv;
 #define DSIGMOID(S) (S*(1-S)) // derivative of the sigmoid as a function of the sigmoid's output
 void CNN::train(double ***train_x,double** train_label,int NumOfImage)
 {
@@ -748,7 +747,7 @@ void CNN::load_weight()
 	int i,j,k,l;
 	FILE *fp;
 	//load the first conv layer weight and bias
-     if((fp=fopen("D:\\test\\conv_layer1_kernel.txt","rt"))==NULL)
+     if((fp=fopen("./bin/conv_layer1_kernel.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv1_w\n");
 	 }
@@ -761,7 +760,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("D:\\test\\conv_layer1_bias.txt","rt"))==NULL)
+     if((fp=fopen("./bin/conv_layer1_bias.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv1_b\n");
 	 }
@@ -775,7 +774,7 @@ void CNN::load_weight()
 	  iter++;iter++;
       m_kernel=(*iter).kernel;
 	  m_bias=(*iter).bias;
-       if((fp=fopen("D:\\test\\conv_layer2_kernel.txt","rt"))==NULL)
+       if((fp=fopen("./bin/conv_layer2_kernel.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv2_w\n");
 	 }
@@ -790,7 +789,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("D:\\test\\conv_layer2_bias.txt","rt"))==NULL)
+     if((fp=fopen("./bin/conv_layer2_bias.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv2_b\n");
 	 }
@@ -804,7 +803,7 @@ void CNN::load_weight()
 	  iter++;iter++;
       m_kernel=(*iter).kernel;
 	  m_bias=(*iter).bias;
-       if((fp=fopen("D:\\test\\conv_layer3_kernel.txt","rt"))==NULL)
+       if((fp=fopen("./bin/conv_layer3_kernel.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv3_w\n");
 	 }
@@ -819,7 +818,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("D:\\test\\conv_layer3_bias.txt","rt"))==NULL)
+     if((fp=fopen("./bin/conv_layer3_bias.txt","rt"))==NULL)
 	 {
 		  printf("cannot open conv3_b\n");
 	 }
@@ -829,48 +828,50 @@ void CNN::load_weight()
 		   fscanf(fp,"\n");
 	  }
 	  fclose(fp);
-	  cout<<"load_weight success"<<endl;
+	  cout<<"CNN_load_weight success"<<endl;
 }
 
-int CNN::test_pic(char* name)
+//int CNN::test_pic(char* name)
+//{
+//	int predict;
+//	batchSize=1;
+//	Mat img;
+//	int sum=0;
+//	img=imread(name,0);
+//	if(img.empty())
+//		return -1;
+//	resize(img,img,Size(Len,Len));
+//	uchar *p=img.data;
+//	double ***test;
+//	test=new double**[1];
+//	test[0]=new double*[Len];
+//	for(int i=0;i<Len;i++){
+//		test[0][i]=new double[Len];
+//	}
+//	for(int i=0;i<Len;i++){
+//		for(int j=0;j<Len;j++){
+//			test[0][i][j]=(double)p[i*Len+j];
+//			sum+=(p[i*Len+j]>120);
+//		}
+//	}
+//	cout<<sum<<endl;
+//	forward(test);
+//	layers ::iterator iter = m_layers.end();
+//	iter--;
+//	for (int ii=0; ii<batchSize; ii++)
+//	{
+//		predict = findIndex((*iter).outputmaps[ii]);
+//	}
+//	return predict;
+//}
+
+int CNN::test_Pic(Pic<uchar> img)
 {
 	int predict;
 	batchSize=1;
-	Mat img;
-	img=imread(name,0);
-	if(img.empty())
-		return -1;
-	resize(img,img,Size(Len,Len));
-	uchar *p=img.data;
-	double ***test;
-	test=new double**[1];
-	test[0]=new double*[Len];
-	for(int i=0;i<Len;i++){
-		test[0][i]=new double[Len];
-	}
-	for(int i=0;i<Len;i++){
-		for(int j=0;j<Len;j++){
-			test[0][i][j]=(double)p[i*Len+j];
-		}
-	}
-	forward(test);
-	layers ::iterator iter = m_layers.end();
-	iter--;
-	for (int ii=0; ii<batchSize; ii++)
-	{
-		predict = findIndex((*iter).outputmaps[ii]);
-	}
-	return predict;
-}
-
-int CNN::test_frame(Mat img)
-{
-	int predict;
-	batchSize=1;
-	Mat img2;
-	if(img.empty())
-		return -1;
-	resize(img,img2,Size(Len,Len));
+	int sum=0;
+	Pic<uchar> img2;
+	m_resize(img,img2,Len,Len);
 	uchar *p=img2.data;
 	double ***test;
 	test=new double**[1];
@@ -881,8 +882,11 @@ int CNN::test_frame(Mat img)
 	for(int i=0;i<Len;i++){
 		for(int j=0;j<Len;j++){
 			test[0][i][j]=(double)p[i*Len+j];
+			sum+=(p[i*Len+j]>100);
 		}
 	}
+	if(sum<20)
+		return -1;
 	forward(test);
 	layers ::iterator iter = m_layers.end();
 	iter--;
@@ -893,40 +897,70 @@ int CNN::test_frame(Mat img)
 	return predict;
 }
 
-vector<int> CNN::test_frame(vector<Mat> imgs)
-{
-	vector<int> predict;
-	Mat img2;
-	int num=imgs.size();
-	batchSize=num;
-	if(num==0){
-		predict.push_back(-1);
-		return predict;
-	}
-	double ***test;
-	test=new double**[num];
-	test[0]=new double*[Len];
-	for(int i=0;i<Len;i++){
-		test[0][i]=new double[Len];
-	}
-	for(int n=0;n<num;n++){
-		resize(imgs[n],img2,Size(Len,Len));
-		uchar *p=img2.data;
-		for(int i=0;i<Len;i++){
-			for(int j=0;j<Len;j++){
-				test[n][i][j]=(double)p[i*Len+j];
-			}
-		}
-	}
-	forward(test);
-	layers ::iterator iter = m_layers.end();
-	iter--;
-	for (int ii=0; ii<batchSize; ii++)
-	{
-		predict.push_back(findIndex((*iter).outputmaps[ii]));
-	}
-	return predict;
-}
+//int CNN::test_frame(Mat img)
+//{
+//	int predict;
+//	batchSize=1;
+//	Mat img2;
+//	if(img.empty())
+//		return -1;
+//	resize(img,img2,Size(Len,Len));
+//	uchar *p=img2.data;
+//	double ***test;
+//	test=new double**[1];
+//	test[0]=new double*[Len];
+//	for(int i=0;i<Len;i++){
+//		test[0][i]=new double[Len];
+//	}
+//	for(int i=0;i<Len;i++){
+//		for(int j=0;j<Len;j++){
+//			test[0][i][j]=(double)p[i*Len+j];
+//		}
+//	}
+//	forward(test);
+//	layers ::iterator iter = m_layers.end();
+//	iter--;
+//	for (int ii=0; ii<batchSize; ii++)
+//	{
+//		predict = findIndex((*iter).outputmaps[ii]);
+//	}
+//	return predict;
+//}
+//
+//vector<int> CNN::test_frame(vector<Mat> imgs)
+//{
+//	vector<int> predict;
+//	Mat img2;
+//	int num=imgs.size();
+//	batchSize=num;
+//	if(num==0){
+//		predict.push_back(-1);
+//		return predict;
+//	}
+//	double ***test;
+//	test=new double**[num];
+//	test[0]=new double*[Len];
+//	for(int i=0;i<Len;i++){
+//		test[0][i]=new double[Len];
+//	}
+//	for(int n=0;n<num;n++){
+//		resize(imgs[n],img2,Size(Len,Len));
+//		uchar *p=img2.data;
+//		for(int i=0;i<Len;i++){
+//			for(int j=0;j<Len;j++){
+//				test[n][i][j]=(double)p[i*Len+j];
+//			}
+//		}
+//	}
+//	forward(test);
+//	layers ::iterator iter = m_layers.end();
+//	iter--;
+//	for (int ii=0; ii<batchSize; ii++)
+//	{
+//		predict.push_back(findIndex((*iter).outputmaps[ii]));
+//	}
+//	return predict;
+//}
 
 void CNN::getlayerweight()
 {

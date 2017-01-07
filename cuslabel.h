@@ -1,5 +1,6 @@
-#pragma once
-#include <QCameraViewfinder>
+﻿#ifndef CUSLABEL_H
+#define CUSLABEL_H
+#include <QLabel>
 #include <QWidget>
 #include <QPainter>
 #include <QDebug>
@@ -7,13 +8,12 @@
 #include <QMouseEvent>
 #include <QMap>
 #include "CusRect.h"
-
-class CusViewFinder :public QCameraViewfinder
+class CusLabel : public QLabel
 {
     Q_OBJECT
-
 public:
-	CusViewFinder();
+    explicit CusLabel(QWidget *parent = 0);
+    CusLabel();
     void enableRect();
     void disableRect();
     void setActionMapContent(int key,QString value);
@@ -25,17 +25,17 @@ public:
 signals:
     void ListChanged(QMap<int, CusRect> recMap,QMap<int, QString> actionMap);
 
-
 protected:
-	int mapIndex;
-	bool startflag;
-	bool drawflag;
-	QPoint startPoint;
-	QPoint endPoint;
+    int mapIndex;
+    bool startflag;
+    bool drawflag;
+    QPoint startPoint;
+    QPoint endPoint;
 
-	void paintEvent(QPaintEvent *e);
-	void mousePressEvent(QMouseEvent *event);
-	void mouseReleaseEvent(QMouseEvent *event);
-	void mouseMoveEvent(QMouseEvent *event);
+    void paintEvent(QPaintEvent *e);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 };
 
+#endif // CUSLABEL_H

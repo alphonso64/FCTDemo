@@ -1,12 +1,11 @@
 #ifndef CNN_H
 #define CNN_H
 #include "iostream"
-#include "util.h"
+#include "CNN_util.h"
 #include "vector"
 #include "Layer.h"
-#include "opencv2/opencv.hpp"
+#include "pic.h"
 using namespace std;
-using namespace cv;
 #define Len 28
 typedef vector<Layer > layers;
 //Builder some layers that you want
@@ -52,8 +51,9 @@ public:
 	void test_o(double*** test_x,double** test_label,int numofimage);
 	void load_weight();
 	int test_pic(char* name);
-	int test_frame(Mat img);
-	vector<int> test_frame(vector<Mat> imgs);
+	int test_Pic(Pic<uchar> img);
+	//int test_frame(Mat img);
+	//vector<int> test_frame(vector<Mat> imgs);
 	
 	void setup(int batchSize);// builder CNN with batchSize and initialize some parameters of each layer
 	void forward(double*** x);

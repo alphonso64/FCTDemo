@@ -1,5 +1,5 @@
 #include "Layer.h"
-#include "util.h"
+#include "CNN_util.h"
 Layer Layer:: buildInputLayer(size mapsize)
 {
 	Layer layer;
