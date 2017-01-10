@@ -15,6 +15,8 @@ typedef struct replybuf
 
     uint  similarity;
 
+    uint  left;
+    uint  up;
     uint  width;
     uint  height;
 
@@ -32,7 +34,6 @@ public:
     QRect getRect(int width, int height);
 
     bool validate;
-private:
 	float x1, x2, y1, y2;
 };
 

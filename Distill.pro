@@ -13,6 +13,7 @@ TARGET = Distill
 TEMPLATE = app
 
 QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
+#DEFINES += QT_NO_WARNING_OUTPUT\ QT_NO_DEBUG_OUTPUT
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -34,7 +35,10 @@ SOURCES += main.cpp\
     algorithm/m_matchtemp.cpp \
     algorithm/m_dft.cpp \
     algorithm/m_point.cpp \
-    algorithm/m_size.cpp
+    algorithm/m_size.cpp \
+    util.cpp \
+    regular.cpp \
+    patternfile.cpp
 
 HEADERS  += mainwindow.h \
     CusRect.h \
@@ -61,7 +65,11 @@ HEADERS  += mainwindow.h \
     algorithm/m_size.h \
     algorithm/m_parameter.h \
     algorithm/m_Complex.h \
-    algorithm/m_autobuffer.h
+    algorithm/m_autobuffer.h \
+    const_define.h \
+    util.h \
+    regular.h \
+    patternfile.h
 
 FORMS    += mainwindow.ui
 

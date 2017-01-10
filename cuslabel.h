@@ -8,6 +8,8 @@
 #include <QMouseEvent>
 #include <QMap>
 #include "CusRect.h"
+#include "regular.h"
+
 class CusLabel : public QLabel
 {
     Q_OBJECT
@@ -16,26 +18,23 @@ public:
     CusLabel();
     void enableRect();
     void disableRect();
-    void setActionMapContent(int key,QString value);
-    void setTempsMapContent(int key,QString value);
-    void removeRectMapContent(int key);
-    QMap<int, CusRect> recMap;
-    QMap<int, QString> actionMap;
-    QMap<int, QString> tempMap;
+    Regular* getRegular();
+
 signals:
     void ListChanged(QMap<int, CusRect> recMap,QMap<int, QString> actionMap);
 
 protected:
-    int mapIndex;
-    bool startflag;
-    bool drawflag;
-    QPoint startPoint;
-    QPoint endPoint;
-
     void paintEvent(QPaintEvent *e);
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+
+private:
+    Regular *regular;
+    bool startflag;
+    bool drawflag;
+    QPoint startPoint;
+    QPoint endPoint;
 };
 
 #endif // CUSLABEL_H

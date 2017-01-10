@@ -5,54 +5,42 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <algorithm/match_util.h>
-#define TEMPSPATH "./temps"
+#include "util.h"
+#include "patternfile.h"
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
-    int ret;
     ui->setupUi(this);
     this->setWindowTitle("FCTDEMO");
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
     ui->tableWidget->setRowCount(0);    
-    ui->tableWidget->setColumnCount(2);  
-    ui->tableWidget_2->setRowCount(0);
-    ui->tableWidget_2->setColumnCount(2);
+    ui->tableWidget->setColumnCount(3);
 
-//    ui->label->setScaledContents(true);
 
     QHeaderView* headerView = ui->tableWidget->verticalHeader();
     headerView->setHidden(true);
-    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-
-    headerView = ui->tableWidget_2->verticalHeader();
-    headerView->setHidden(true);
-    ui->tableWidget_2->horizontalHeader()->setStretchLastSection(true);
-
     QStringList header;
-    header<<"序号"<<"动作";
+    header<<"序号"<<"动作"<<"结果";
     ui->tableWidget->setHorizontalHeaderLabels(header);
 	ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 	ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
+//    ui->tableWidget->resizeColumnsToContents();
+    ui->tableWidget->setEditTriggers (QAbstractItemView::NoEditTriggers);
 
-    QStringList header_;
-    header_<<"序号"<<"结果";
-    ui->tableWidget_2->setHorizontalHeaderLabels(header_);
-    ui->tableWidget_2->setSelectionMode(QAbstractItemView::SingleSelection);
-    ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->camButton->setCheckable(true);
+    ui->picButton->setCheckable(true);
+    ui->camButton->setChecked(true);
+    group.addButton(ui->camButton,CAM_CAP);
+    group.addButton(ui->picButton,PIC_CAP);
+    capID = CAM_CAP;
 
     ui->addButton->setCheckable(true);
-
-    //listenSocket = new QTcpServer;
-    //listenSocket->listen(QHostAddress::AnyIPv4, 8888);
-
     initNet();
-    initTemp();
-
     vect.clear();
-
     tcpworker = new TCPRWWorker();
     tcpworker->isthreadstopped = 0;
     tcpworker->doprocessimage  = 0;
@@ -69,14 +57,86 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->delButton, SIGNAL(clicked()), this, SLOT(DelClick()));
     connect(ui->captureButton,SIGNAL(clicked()), this, SLOT(detectClick()));
     connect(cuscamera, SIGNAL(capRdy()), this, SLOT(capimg()));
+    connect(cuscamera, SIGNAL(camInitRdy(int)), this, SLOT(camInitRdy(int)));
     connect(tcpworker, SIGNAL(processImg(int)), this, SLOT(proecssBlock(int)));
     connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(saveimg()));
+    connect(&group,SIGNAL(buttonClicked(int)),this,SLOT(camSelect(int)));
     cuscamera->start();
+    statusBar()->addWidget( statusLabel = new QLabel("正在打开摄像机 "));
+    statusBar()->addWidget( statusLabel_ = new QLabel("流程文件：未选择"));
+    statusBar()->setContentsMargins(6,0,0,0);
+    statusLabel_->setContentsMargins(6,0,0,0);
+    ui->camButton->setEnabled(false);
+    ui->picButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updateStatusBar(int res)
+{
+    QString val ;
+    if(capID == CAM_CAP){
+        if(res == FAIL){
+            val.append("打开摄像机失败 ");
+        }else{
+            val.append("图像来源：摄像机 分辨率："+QString::number(cuscamera->imageproc->m_nImageWidth)+"x"+QString::number(cuscamera->imageproc->m_nImageHeight));
+        }
+    }else{
+        if(res == FAIL){
+            val.append("未选择本地图片 ");
+        }else{
+            val.append("图像来源：本地图片 分辨率："+QString::number(image.width())+"x"+QString::number(image.height()));
+        }
+    }
+    statusLabel->setText(val);
+}
+
+void MainWindow::updateStatusBar()
+{
+    QString val  ;
+    QString  path = ui->label_2->getRegular()->pattenPath;
+    if(path.length() == 0){
+        val.append("流程文件：未选择");
+    }else{
+        val.append("流程文件:"+path);
+    }
+    statusLabel_->setText(val);
+}
+
+void MainWindow::camSelect(int id)
+{
+    if(id == CAM_CAP){
+        capID = CAM_CAP;
+        if(cuscamera->isFinished()){
+            statusLabel->setText("正在打开摄像机");
+            ui->camButton->setEnabled(false);
+            ui->picButton->setEnabled(false);
+            cuscamera->start();
+        }else{
+            updateStatusBar(SUCCESS);
+        }
+    }else if(id == PIC_CAP){
+        capID = PIC_CAP;
+        QString path = QFileDialog::getOpenFileName(this, tr("Open Image"), TEMPSPATH, tr("Image Files(*.bmp)"));
+        if(path.length() == 0) {
+            updateStatusBar(FAIL);
+            ui->label_2->setPixmap(QPixmap(ui->label_2->width(),ui->label_2->height()));
+        }else{
+            image = QImage(path);
+            ui->label_2->setPixmap(QPixmap::fromImage(image.scaled(ui->label_2->width(),ui->label_2->height())));
+            updateStatusBar(SUCCESS);
+        }
+    }
+}
+
+void MainWindow::camInitRdy(int val)
+{
+    updateStatusBar(val);
+    ui->camButton->setEnabled(true);
+    ui->picButton->setEnabled(true);
 }
 
 void MainWindow::saveimg()
@@ -85,18 +145,20 @@ void MainWindow::saveimg()
     if(row > -1)
     {
         int key = ui->tableWidget->item(row,0)->text().toInt();
-        CusRect rect = ui->label_2->recMap.value(key);
+        CusRect rect = ui->label_2->getRegular()->recMap.value(key);
         QRect rec = rect.getRect(image.width(), image.height());
         QImage temp = image.copy(rec);
-        QString path = QFileDialog::getSaveFileName(this, tr("Open Image"), TEMPSPATH, tr("Image Files(*.jpg)"));
-        temp.save(path,"jpg",100);
+        QString path = QFileDialog::getSaveFileName(this, tr("保存模板文件"), TEMPSPATH, tr("Image Files(*.bmp)"));
+        QPixmap pixmap = QPixmap::fromImage(temp);
+        pixmap.save(path,"bmp",100);
     }else{
-        QMessageBox::about(NULL, "error", "no item select");
+        QMessageBox::about(NULL, "error", "未选择要保存的区域");
     }
 }
 
 void  MainWindow::CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> actionMap)
 {
+    qDebug()<<"CusRectListChanged";
 	ui->tableWidget->clearContents();
     QMapIterator<int, CusRect> iter(map);
 	ui->tableWidget->setRowCount(map.size());
@@ -111,7 +173,7 @@ void  MainWindow::CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> a
         QString action = actionMap.value(iter.key());
         if(action.compare(MATCH_PROC)==0)
         {
-            QString temp = ui->label_2->tempMap.value(iter.key());
+            QString temp = ui->label_2->getRegular()->tempsMap.value(iter.key()).name;
             QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+temp+")");
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget->setItem(cnt++, 1, item);
@@ -126,7 +188,6 @@ void  MainWindow::CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> a
         {
             cnt++;
         }
-
 	}
 }
 
@@ -151,7 +212,8 @@ void MainWindow::DelClick()
     {
         QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT);
         int key = ui->tableWidget->item(row,0)->text().toInt();
-        ui->label_2->removeRectMapContent(key);
+        ui->label_2->getRegular()->removeRectMapContent(key);
+        CusRectListChanged(ui->label_2->getRegular()->recMap,ui->label_2->getRegular()->actionMap);
     }
 }
 
@@ -160,22 +222,29 @@ void MainWindow::MatchClick()
     int row = ui->tableWidget->currentRow();
     if(row > -1)
     {
-        QString path = QFileDialog::getOpenFileName(this, tr("Open Image"), TEMPSPATH, tr("Image Files(*.jpg)"));
+        QString path = QFileDialog::getOpenFileName(this, tr("选择模板文件"), TEMPSPATH, tr("Image Files(*.bmp)"));
         if(path.length() == 0) {
             return;
         }else{
             QFileInfo fileInfo(path);
 
-            if(temps.contains(fileInfo.fileName()))
-            {
-                QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+fileInfo.fileName()+")");
-                item->setTextAlignment(Qt::AlignCenter);
-                ui->tableWidget->setItem(row, 1, item);
 
-                int key = ui->tableWidget->item(row,0)->text().toInt();
-                ui->label_2->setActionMapContent(key,MATCH_PROC);
-                ui->label_2->setTempsMapContent(key,fileInfo.fileName());
-            }
+            QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+fileInfo.fileName()+")");
+            item->setTextAlignment(Qt::AlignCenter);
+            ui->tableWidget->setItem(row, 1, item);
+
+            PatternFile pattern;
+            pattern.name = fileInfo.fileName();
+            pattern.path = fileInfo.path();
+            QImage tempImg(fileInfo.filePath());
+            Pic<uchar> pimg;
+            pimg.createToGray(tempImg,4);
+            pattern.temps = make_temps(pimg);
+
+            int key = ui->tableWidget->item(row,0)->text().toInt();
+            ui->label_2->getRegular()->setActionMapContent(key,MATCH_PROC);
+            ui->label_2->getRegular()->setTempsMapContent(key,pattern);
+
         }
     }
 }
@@ -189,7 +258,7 @@ void MainWindow::RecogClick()
         item->setTextAlignment(Qt::AlignCenter);
         ui->tableWidget->setItem(row, 1, item);
         int key = ui->tableWidget->item(row,0)->text().toInt();
-        ui->label_2->setActionMapContent(key,RECOG_PROC);
+        ui->label_2->getRegular()->setActionMapContent(key,RECOG_PROC);
     }
 }
 
@@ -211,15 +280,10 @@ void MainWindow::replytoclient()
 
 void MainWindow::detectClick()
 {
-    ui->tableWidget_2->clearContents();
-    ui->tableWidget_2->setRowCount(0);
-
-    QMapIterator<int, CusRect> iter(ui->label_2->recMap);
-    QVectorIterator<int> viter(tcpworker->blockidlist);
-
+    QMapIterator<int, CusRect> iter(ui->label_2->getRegular()->recMap);
     int cnt = 0;
 
-    ui->label->recMap = ui->label_2->recMap;
+    ui->label->recMap = ui->label_2->getRegular()->recMap;
     ui->label->setPixmap(QPixmap::fromImage(image.scaled(ui->label->width(),ui->label->height())));
 
     while (iter.hasNext())
@@ -229,47 +293,39 @@ void MainWindow::detectClick()
         CusRect rect = iter.value();
         QRect rec = rect.getRect(image.width(), image.height());
         QImage temp = image.copy(rec);
-
-        QString action = ui->label_2->actionMap.value(iter.key());
+        temp.save("D:/test1/"+QString::number(iter.key())+".jpg","jpg",100);
+        QString action = ui->label_2->getRegular()->actionMap.value(iter.key());
         if(action.compare(MATCH_PROC) == 0)
         {
-            ui->tableWidget_2->setRowCount(ui->tableWidget_2->rowCount()+1);
             QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
             item->setTextAlignment(Qt::AlignCenter);
-            ui->tableWidget_2->setItem(cnt, 0, item);
             Pic<uchar> pimg;
-            pimg.createToGray(temp,3);
-            qDebug()<<temp.width()<<" "<<temp.height();
-            double res = mul_tempRoi(pimg,temps.value(ui->label_2->tempMap.value(iter.key())),1);
-
-            qDebug()<<"res"<<res;
-            if(res > 0.5f)
-            {
-                item  = new QTableWidgetItem(QString("off"));
+            if(capID == CAM_CAP){
+                pimg.createToGray(temp,3);
+            }else if(capID == PIC_CAP){
+                pimg.createToGray(temp,4);
             }
-            else if(res>-0.1f)
-            {
-                item  = new QTableWidgetItem("on");
-            }
-            else
+            double res = mul_tempRoi(pimg,ui->label_2->getRegular()->tempsMap.value(iter.key()).temps,1);
+            if(res <-0.1f)
             {
                 item  = new QTableWidgetItem("error");
+            }else{
+                int val = (1-res)*100;
+                item  = new QTableWidgetItem(QString::number(val)+"%");
             }
             item->setTextAlignment(Qt::AlignCenter);
-            ui->tableWidget_2->setItem(cnt++, 1, item);
+            ui->tableWidget->setItem(cnt++, 2, item);
 
         }else if(action.compare(RECOG_PROC) == 0)
         {
-            ui->tableWidget_2->setRowCount(ui->tableWidget_2->rowCount()+1);
             QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
             item->setTextAlignment(Qt::AlignCenter);
-            ui->tableWidget_2->setItem(cnt, 0, item);
-
-//            cv::cvtColor(mat, mat, CV_RGBA2GRAY);
-//            int predict = cnn->test_frame(mat);
-
             Pic<uchar> pimg;
-            pimg.createToGray(temp,3);
+            if(capID == CAM_CAP){
+                pimg.createToGray(temp,3);
+            }else if(capID == PIC_CAP){
+                pimg.createToGray(temp,4);
+            }
             int predict = cnn->test_Pic(pimg);
             if(predict >= 0){
                 item  = new QTableWidgetItem(QString::number(predict));
@@ -278,7 +334,9 @@ void MainWindow::detectClick()
             }
 
             item->setTextAlignment(Qt::AlignCenter);
-            ui->tableWidget_2->setItem(cnt++, 1, item);
+            ui->tableWidget->setItem(cnt++, 2, item);
+        }else{
+            cnt++;
         }
     }
 }
@@ -286,96 +344,87 @@ void MainWindow::detectClick()
 void MainWindow::proecssBlock(int n )
 {
     QByteArray array;
-    QVectorIterator<int> viter(tcpworker->blockidlist);
+        QVectorIterator<int> viter(tcpworker->blockidlist);
 
-    uchar totalblock = 0;
-    int blockid;
-    CusReplyData  custdata;
-    UINT32 totallen = 0;
-    char number[64] = "";
-    char filename[64];//  = "D:\\test\\temps\\temp";
-    vect.clear();
+        uchar totalblock = 0;
+        int blockid;
+        CusReplyData  custdata;
+        UINT32 totallen = 0;
+        vect.clear();
+        array.append((char *)&totallen, sizeof(totallen));
+        array.append('\0');
 
-    array.append((char *)&totallen, sizeof(totallen));
-    array.append('\0');
-
-    while(viter.hasNext())
-    {
-        blockid = viter.next();
-
-        if(ui->label_2->recMap.contains(blockid))
+        while(viter.hasNext())
         {
-            CusRect rect = ui->label_2->recMap.value(blockid);
-            QRect rec = rect.getRect(image.width(), image.height());
-            QImage temp = image.copy(rec);
+            blockid = viter.next();
 
-            QString action = ui->label_2->actionMap.value(blockid);
-
-            //save imageblock
-            strcpy_s(filename, "D:\\test\\data");
-            //strcat(strcat(filename, itoa(blockid, number, 10)), ".jpg");
-            //qDebug() << filename;
-            //imwrite(filename, mat);
-
-            if(action.compare(MATCH_PROC) == 0)
+            if(ui->label_2->getRegular()->recMap.contains(blockid))
             {
-                Pic<uchar> pimg;
-                pimg.createToGray(temp,3);
-                qDebug()<<temp.width()<<" "<<temp.height();
+                CusRect rect = ui->label_2->getRegular()->recMap.value(blockid);
+                QRect rec = rect.getRect(image.width(), image.height());
+                QImage temp = image.copy(rec);
+                QString action = ui->label_2->getRegular()->actionMap.value(blockid);
 
-                double res = mul_tempRoi(pimg,temps.value(ui->label_2->tempMap.value(blockid)),1);
-                if(res > 0.5f)
+                if(action.compare(MATCH_PROC) == 0)
                 {
-                    custdata.replybuffer.state = 0;
-                }
-                else if(res > -0.1f)
-                {
-                    custdata.replybuffer.state = 1;
-                }
-                else
-                {
-                    custdata.replybuffer.state = 0xff;
-                }
-                custdata.replybuffer.similarity = static_cast<int>(res * 100.0f + .5f);
-                qDebug() << res << res * 100.0f << custdata.replybuffer.similarity;
+                    Pic<uchar> pimg;
+                    if(capID == CAM_CAP){
+                        pimg.createToGray(temp,3);
+                    }else if(capID == PIC_CAP){
+                        pimg.createToGray(temp,4);
+                    }
+                    double res = mul_tempRoi(pimg,ui->label_2->getRegular()->tempsMap.value(blockid).temps,1);
+                    if(res > 0.5f)
+                    {
+                        custdata.replybuffer.state = 0;
+                    }
+                    else if(res > -0.1f)
+                    {
+                        custdata.replybuffer.state = 1;
+                    }
+                    else
+                    {
+                        custdata.replybuffer.state = 0xff;
+                    }
+                    custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f);
+                    qDebug() << res << res * 100.0f << custdata.replybuffer.similarity;
 
+                }
+                else if(action.compare(RECOG_PROC) == 0)
+                {
+                    Pic<uchar> pimg;
+                    if(capID == CAM_CAP){
+                        pimg.createToGray(temp,3);
+                    }else if(capID == PIC_CAP){
+                        pimg.createToGray(temp,4);
+                    }
+                    int predict = cnn->test_Pic(pimg);
+                    custdata.replybuffer.number = predict;
+                }
+                custdata.replybuffer.similarity = custdata.replybuffer.similarity % 101;
+                custdata.replybuffer.id = blockid;
+                custdata.replybuffer.width  = temp.width();
+                custdata.replybuffer.height = temp.height();
+                custdata.replybuffer.left   = rec.left();
+                custdata.replybuffer.up     = rec.top();
+
+                array.append((char *)(&(custdata.replybuffer)), sizeof(custdata.replybuffer));
+                totalblock++;
+
+                qDebug() << "totalblock:" << totalblock;
             }
-            else if(action.compare(RECOG_PROC) == 0)
-            {
-                Pic<uchar> pimg;
-                pimg.createToGray(temp,3);
-                int predict = cnn->test_Pic(pimg);
-                custdata.replybuffer.number = predict;
-            }
-            custdata.replybuffer.id = blockid;
-            custdata.replybuffer.width = temp.width();
-            custdata.replybuffer.height = temp.height();
-
-            array.append((char *)(&(custdata.replybuffer)), sizeof(custdata.replybuffer));
-            array.append((char *)(temp.bits()), temp.width() * temp.height() * 3);
-
-            //vect.append(custdata);
-            totalblock ++;
-            qDebug() << "totalblock:" << totalblock;
-            //FILE * fp;
-            //strcat(strcat(filename, itoa(blockid, number, 10)), ".data");
-            //fp = fopen(filename, "wb");
-            //fwrite(temp.bits(), 1, temp.width() * temp.height() * 3, fp);
-            //fclose(fp);
         }
-    }
 
-    *(array.data() + 4) = totalblock & 0xff;
-    totallen = array.size();
+        array.append((char *)(image.bits()), image.width() * image.height() * 3);
+        *(array.data() + 4) = totalblock & 0xff;
+        totallen = array.size();
 
-    *(UINT32 *)(array.data()) = totallen;
+        *(UINT32 *)(array.data()) = totallen;
 
-    qDebug() << "array:" << (int)array.at(0) << (int)array.at(1) << (int)array.at(2) << (int)array.at(3) << (int)array.at(4);
-
-    tcpworker->doprocessimage = 0;
-    tcpworker->sendCmd(array.data(), array.size());
-    qDebug() << "array:" << array.size();
-    //replytoclient();
+        qDebug() << "array:" << (int)array.at(0) << (int)array.at(1) << (int)array.at(2) << (int)array.at(3) << (int)array.at(4);
+        tcpworker->doprocessimage = 0;
+        tcpworker->sendCmd(array.data(), array.size());
+        qDebug() << "array:" << array.size();
 
 }
 
@@ -393,28 +442,6 @@ void MainWindow::initNet()
     cnn->load_weight();
 }
 
-void MainWindow::initTemp()
-{
-    QDir dir(TEMPSPATH);
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    dir.setSorting(QDir::Size | QDir::Reversed);
-
-    QFileInfoList list = dir.entryInfoList();
-    for (int i = 0; i < list.size(); ++i)
-    {
-        QFileInfo fileInfo = list.at(i);
-        QImage tempImg(fileInfo.filePath());
-        Pic<uchar> pimg;
-        pimg.createToGray(tempImg,4);
-        temps.insert(fileInfo.fileName(),make_temps(pimg));
-    }
-    qDebug()<<temps.size();
-}
-
-void MainWindow::send2Client()
-{
-
-}
 
 void MainWindow::tcpstartrw()
 {
@@ -423,7 +450,40 @@ void MainWindow::tcpstartrw()
 
 void MainWindow::capimg()
 {
-    image = cuscamera->imageproc->getImg();
-    ui->label_2->setPixmap(QPixmap::fromImage(image.scaled(ui->label_2->width(),ui->label_2->height())));
-//    ui->label->update();
+    if(capID == CAM_CAP){
+        image = cuscamera->imageproc->getImg();
+        ui->label_2->setPixmap(QPixmap::fromImage(image.scaled(ui->label_2->width(),ui->label_2->height())));
+    }
+}
+
+void MainWindow::on_savePicButton_clicked()
+{
+    QString path = QFileDialog::getSaveFileName(this, tr("保存图片"), QDir::homePath(), tr("Image Files(*.bmp)"));
+    QPixmap pixmap = QPixmap::fromImage(image);
+    pixmap.save(path,"bmp",100);
+}
+
+void MainWindow::on_saveFileButton_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this, tr("保存流程文件"), QDir::homePath(),
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(path.length()!=0)
+    {
+        ui->label_2->getRegular()->savePatam2File(path);
+        QMessageBox::about(NULL, "", "保存流程文件成功");
+    }
+
+}
+
+void MainWindow::on_loadFileButton_clicked()
+{
+    QFileDialog::Options options = QFileDialog::ShowDirsOnly;
+    QString path = QFileDialog::getExistingDirectory(this, tr("载入流程文件"), QDir::homePath(),
+                                                    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(path.length()!=0)
+    {
+        ui->label_2->getRegular()->update(path);
+        CusRectListChanged(ui->label_2->getRegular()->recMap,ui->label_2->getRegular()->actionMap);
+        updateStatusBar();
+    }
 }

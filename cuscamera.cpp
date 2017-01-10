@@ -1,5 +1,7 @@
 ﻿#include "cuscamera.h"
-#include<QDebug>
+#include <QDebug>
+#include "const_define.h"
+
 void CusCamera::run()
 {
     imageproc = new ImageProc();
@@ -14,11 +16,17 @@ void CusCamera::run()
     imageproc->m_hDevice = NULL;
     imageproc->m_pImgBuffer = NULL;
     int ret = imageproc->initCamera();
-
-    timer = new QTimer();
-    connect(timer,SIGNAL(timeout()),this,SLOT(timeOut()),Qt::DirectConnection);
-    timer->start(30);
-    exec();
+    emit(camInitRdy(ret));
+    if(ret == SUCCESS){
+        while(true){
+            imageproc->SendCaptureCommand();
+            emit(capRdy());
+        }
+    }
+//    timer = new QTimer();
+//    connect(timer,SIGNAL(timeout()),this,SLOT(timeOut()),Qt::DirectConnection);
+//    timer->start(30);
+//    exec();
 }
 
 void CusCamera::timeOut()

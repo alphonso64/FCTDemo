@@ -2,22 +2,17 @@
 
 CusLabel::CusLabel(QWidget *parent):QLabel(parent)
 {
-    recMap.clear();
-    actionMap.clear();
-    tempMap.clear();
-    mapIndex = 1;
+
     startflag = false;
     drawflag = false;
+    regular = new Regular();
 }
 
 CusLabel::CusLabel()
 {
-    recMap.clear();
-    actionMap.clear();
-    tempMap.clear();
-    mapIndex = 1;
     startflag = false;
     drawflag = false;
+    regular = new Regular();
 }
 
 void CusLabel::enableRect()
@@ -36,8 +31,7 @@ void CusLabel::paintEvent(QPaintEvent *e)
     QLabel::paintEvent(e);
     QPainter p(this);
     p.setPen(QPen(Qt::red, 1));
-    QMapIterator<int, CusRect> iter(recMap);
-
+    QMapIterator<int, CusRect> iter(regular->recMap);
     if (startflag)
     {
         if (startPoint != endPoint)
@@ -78,10 +72,10 @@ void CusLabel::mouseReleaseEvent(QMouseEvent *event)
         endPoint.setY(event->y());
         if (startPoint != endPoint)
         {
-            recMap.insert(mapIndex, CusRect(startPoint, endPoint, this->width(), this->height()));
-            tempMap.insert(mapIndex," ");
-            actionMap.insert(mapIndex++, " ");
-            emit ListChanged(recMap,actionMap);
+            regular->recMap.insert(regular->mapIndex, CusRect(startPoint, endPoint, this->width(), this->height()));
+            regular->tempsMap.insert(regular->mapIndex, PatternFile());
+            regular->actionMap.insert(regular->mapIndex++, " ");
+            emit ListChanged(regular->recMap,regular->actionMap);
             update();
         }
     }
@@ -101,43 +95,13 @@ void CusLabel::mouseMoveEvent(QMouseEvent *event){
                 endPoint.setX(x);
                 endPoint.setY(y);
             }
+            update();
         }
     }
-    update();
 }
 
-void CusLabel::setActionMapContent(int key, QString value)
+Regular* CusLabel::getRegular()
 {
-    if(actionMap.contains(key))
-    {
-        actionMap.remove(key);
-        actionMap.insert(key,value);
-    }
-}
-
-void CusLabel::setTempsMapContent(int key, QString value)
-{
-    if(tempMap.contains(key))
-    {
-        tempMap.remove(key);
-        tempMap.insert(key,value);
-    }
-}
-
-void CusLabel::removeRectMapContent(int key)
-{
-    if(actionMap.contains(key))
-    {
-        actionMap.remove(key);
-    }
-    if(recMap.contains(key))
-    {
-        recMap.remove(key);
-    }
-    if(tempMap.contains(key))
-    {
-        tempMap.remove(key);
-    }
-    emit ListChanged(recMap,actionMap);
+    return regular;
 }
 

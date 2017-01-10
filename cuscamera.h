@@ -18,6 +18,7 @@ private slots:
     void timeOut();
 signals:
     void capRdy();
+    void camInitRdy(int);
 public:
     ImageProc *imageproc;
 private:

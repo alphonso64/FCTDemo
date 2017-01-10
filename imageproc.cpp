@@ -1,6 +1,6 @@
 #include "imageproc.h"
 #include <QDebug>
-
+#include "const_define.h"
 #define  GX_VERIFY(emStatus) \
                             if (emStatus != GX_STATUS_SUCCESS)\
                             {\
@@ -36,7 +36,7 @@ int ImageProc::initCamera()
     qDebug()<<nDevNum;
     if (nDevNum <= 0)
     {  
-        return -1;
+        return FAIL;
     }
 
     if (m_hDevice != NULL)
@@ -62,7 +62,7 @@ int ImageProc::initCamera()
     bRet = PrepareForShowImg();
     if (!bRet)
     {
-        return -1;
+        return FAIL;
     }
 
     m_bIsOpen = true;
@@ -76,7 +76,7 @@ int ImageProc::initCamera()
     emStatus = GXSetEnum(m_hDevice,GX_ENUM_BALANCE_WHITE_AUTO,GX_BALANCE_WHITE_AUTO_CONTINUOUS);
 
 
-    return 0;
+    return SUCCESS;
 
 }
 

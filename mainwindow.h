@@ -3,13 +3,15 @@
 
 #include <QMainWindow>
 #include "imageproc.h"
+#include "const_define.h"
 #include "tcprwworker.h"
 #include <vector>
 #include <QtNetwork>
 #include "cuscamera.h"
 #include "algorithm/CNN.h"
-#include "vector"
 #include "CusRect.h"
+#include <QButtonGroup>
+#include <QLabel>
 using namespace std;
 
 #pragma execution_character_set("utf-8")
@@ -37,27 +39,33 @@ private slots:
     void proecssBlock(int n);
     void capimg();
     void saveimg();
-    //void processConnection();
-    //void processText();
+    void camInitRdy(int);
+    void camSelect(int);
+    void on_savePicButton_clicked();
+
+    void on_saveFileButton_clicked();
+
+    void on_loadFileButton_clicked();
 
 private:
     void initNet();
-    void initTemp();
     void send2Client();
     void tcpstartrw();
     void replytoclient();
-    Ui::MainWindow *ui;
+    void updateStatusBar(int state);
+    void updateStatusBar();
 
+    Ui::MainWindow *ui;
+    int capID;
+    QButtonGroup group;
     CNN *cnn;
-    QMap<QString,vector<Pic<uchar>>> temps;
     TCPRWWorker * tcpworker;
     QVector<CusReplyData> vect;
     CusCamera *cuscamera;
     QImage image;
     QImage detetcImage;
-    //QTcpServer * listenSocket;
-    //QTcpSocket * readWriteSocket;
-//    vector<Mat> temps;
+    QLabel *statusLabel;
+    QLabel *statusLabel_;
 public:
 
 };
