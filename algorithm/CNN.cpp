@@ -2,6 +2,7 @@
 #include "vector"
 #include "iostream"
 #include "match_util.h"
+#include "const_define.h"
 using namespace std;
 #define DSIGMOID(S) (S*(1-S)) // derivative of the sigmoid as a function of the sigmoid's output
 void CNN::train(double ***train_x,double** train_label,int NumOfImage)
@@ -747,7 +748,7 @@ void CNN::load_weight()
 	int i,j,k,l;
 	FILE *fp;
 	//load the first conv layer weight and bias
-     if((fp=fopen("./bin/conv_layer1_kernel.txt","rt"))==NULL)
+     if((fp=fopen(LAYER_1_KERNEL,"rt"))==NULL)
 	 {
 		  printf("cannot open conv1_w\n");
 	 }
@@ -760,7 +761,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("./bin/conv_layer1_bias.txt","rt"))==NULL)
+     if((fp=fopen(LAYER_1_BIAS,"rt"))==NULL)
 	 {
 		  printf("cannot open conv1_b\n");
 	 }
@@ -774,7 +775,7 @@ void CNN::load_weight()
 	  iter++;iter++;
       m_kernel=(*iter).kernel;
 	  m_bias=(*iter).bias;
-       if((fp=fopen("./bin/conv_layer2_kernel.txt","rt"))==NULL)
+       if((fp=fopen(LAYER_2_KERNEL,"rt"))==NULL)
 	 {
 		  printf("cannot open conv2_w\n");
 	 }
@@ -789,7 +790,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("./bin/conv_layer2_bias.txt","rt"))==NULL)
+     if((fp=fopen(LAYER_2_BIAS,"rt"))==NULL)
 	 {
 		  printf("cannot open conv2_b\n");
 	 }
@@ -803,7 +804,7 @@ void CNN::load_weight()
 	  iter++;iter++;
       m_kernel=(*iter).kernel;
 	  m_bias=(*iter).bias;
-       if((fp=fopen("./bin/conv_layer3_kernel.txt","rt"))==NULL)
+       if((fp=fopen(LAYER_3_KERNEL,"rt"))==NULL)
 	 {
 		  printf("cannot open conv3_w\n");
 	 }
@@ -818,7 +819,7 @@ void CNN::load_weight()
 		 }
 	 }
 	 fclose(fp);
-     if((fp=fopen("./bin/conv_layer3_bias.txt","rt"))==NULL)
+     if((fp=fopen(LAYER_3_BIAS,"rt"))==NULL)
 	 {
 		  printf("cannot open conv3_b\n");
 	 }

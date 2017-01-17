@@ -3,15 +3,15 @@
 
 typedef struct replybuf
 {
-    uchar id;
-    uchar grayscale;
-    uchar r;
-    uchar g;
+    uint id;
+    uint grayscale;
+    uint r;
+    uint g;
 
-    uchar b;
-    uchar number;
-    uchar state;
-    uchar rev;
+    uint b;
+    uint number;
+    uint state;
+    uint rev;
 
     uint  similarity;
 

@@ -371,6 +371,7 @@ debug\moc_mainwindow.cpp: ..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\
 		GxIAPI.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
+		const_define.h \
 		tcprwworker.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
@@ -1098,6 +1099,8 @@ debug\moc_cuslabel.cpp: ..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QL
 		algorithm\scalar.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		patternfile.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSettings \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsettings.h \
 		cuslabel.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe
 	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe $(DEFINES) -D_MSC_VER=1800 -D_WIN32 -IC:/Qt/Qt5.7.1/5.7/msvc2013/mkspecs/win32-msvc2013 -IC:/Users/thingword-A/QT/FCTDemo-master -IC:/Qt/Qt5.7.1/5.7/msvc2013/include -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtWidgets -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtGui -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtANGLE -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtNetwork -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtCore cuslabel.h -o debug\moc_cuslabel.cpp
@@ -1331,7 +1334,9 @@ ui_mainwindow.h: mainwindow.ui \
 		algorithm\m_point.h \
 		algorithm\scalar.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
-		patternfile.h
+		patternfile.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSettings \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsettings.h
 	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\uic.exe mainwindow.ui -o ui_mainwindow.h
 
 compiler_yacc_decl_make_all:
@@ -1453,6 +1458,7 @@ debug\main.obj: main.cpp mainwindow.h \
 		GxIAPI.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
+		const_define.h \
 		tcprwworker.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
@@ -1744,6 +1750,7 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		GxIAPI.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
+		const_define.h \
 		tcprwworker.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
@@ -1972,6 +1979,7 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMap \
 		regular.h \
 		patternfile.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSettings \
 		paintlabel.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTextCodec \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QFileDialog \
@@ -1990,7 +1998,6 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		algorithm/m_mulspectrums.h \
 		algorithm/m_interal.h \
 		algorithm/m_meanStdDev.h \
-		const_define.h \
 		util.h
 
 debug\CusRect.obj: CusRect.cpp CusRect.h \
@@ -2669,7 +2676,9 @@ debug\cuslabel.obj: cuslabel.cpp cuslabel.h \
 		algorithm/m_point.h \
 		algorithm/scalar.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
-		patternfile.h
+		patternfile.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSettings \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsettings.h
 
 debug\m_meanStdDev.obj: algorithm\m_meanStdDev.cpp algorithm/m_meanStdDev.h \
 		algorithm/m_autobuffer.h \
@@ -3570,7 +3579,26 @@ debug\regular.obj: regular.cpp regular.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
 		patternfile.h \
-		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qDebug.h
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSettings \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsettings.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qDebug.h \
+		imageproc.h \
+		DxImageProc.h \
+		GxIAPI.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
+		algorithm/match_util.h \
+		algorithm/m_matchtemp.h \
+		algorithm/m_crossCorr.h \
+		algorithm/m_dft.h \
+		algorithm/m_autobuffer.h \
+		algorithm/m_Complex.h \
+		algorithm/m_parameter.h \
+		algorithm/m_mulspectrums.h \
+		algorithm/m_interal.h \
+		algorithm/m_meanStdDev.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QFile \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfile.h \
+		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfiledevice.h
 
 debug\patternfile.obj: patternfile.cpp patternfile.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \

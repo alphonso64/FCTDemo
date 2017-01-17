@@ -344,88 +344,94 @@ void MainWindow::detectClick()
 void MainWindow::proecssBlock(int n )
 {
     QByteArray array;
-        QVectorIterator<int> viter(tcpworker->blockidlist);
+    QVectorIterator<int> viter(tcpworker->blockidlist);
 
-        uchar totalblock = 0;
-        int blockid;
-        CusReplyData  custdata;
-        UINT32 totallen = 0;
-        vect.clear();
-        array.append((char *)&totallen, sizeof(totallen));
-        array.append('\0');
+    uchar totalblock = 0;
+    int blockid;
+    CusReplyData  custdata;
+    UINT32 totallen = 0;
+    vect.clear();
+    array.append((char *)&totallen, sizeof(totallen));
+    array.append((char *)&totallen, sizeof(totallen));
 
-        while(viter.hasNext())
+    while(viter.hasNext())
+    {
+        blockid = viter.next();
+
+        if(ui->label_2->getRegular()->recMap.contains(blockid))
         {
-            blockid = viter.next();
+            CusRect rect = ui->label_2->getRegular()->recMap.value(blockid);
+            QRect rec = rect.getRect(image.width(), image.height());
+            QImage temp = image.copy(rec);
+            QString action = ui->label_2->getRegular()->actionMap.value(blockid);
 
-            if(ui->label_2->getRegular()->recMap.contains(blockid))
+            if(action.compare(MATCH_PROC) == 0)
             {
-                CusRect rect = ui->label_2->getRegular()->recMap.value(blockid);
-                QRect rec = rect.getRect(image.width(), image.height());
-                QImage temp = image.copy(rec);
-                QString action = ui->label_2->getRegular()->actionMap.value(blockid);
-
-                if(action.compare(MATCH_PROC) == 0)
-                {
-                    Pic<uchar> pimg;
-                    if(capID == CAM_CAP){
-                        pimg.createToGray(temp,3);
-                    }else if(capID == PIC_CAP){
-                        pimg.createToGray(temp,4);
-                    }
-                    double res = mul_tempRoi(pimg,ui->label_2->getRegular()->tempsMap.value(blockid).temps,1);
-                    if(res > 0.5f)
-                    {
-                        custdata.replybuffer.state = 0;
-                    }
-                    else if(res > -0.1f)
-                    {
-                        custdata.replybuffer.state = 1;
-                    }
-                    else
-                    {
-                        custdata.replybuffer.state = 0xff;
-                    }
-                    custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f);
-                    qDebug() << res << res * 100.0f << custdata.replybuffer.similarity;
-
+                Pic<uchar> pimg;
+                if(capID == CAM_CAP){
+                    pimg.createToGray(temp,3);
+                }else if(capID == PIC_CAP){
+                    pimg.createToGray(temp,4);
                 }
-                else if(action.compare(RECOG_PROC) == 0)
+                double res = mul_tempRoi(pimg,ui->label_2->getRegular()->tempsMap.value(blockid).temps,1);
+                if(res > 0.5f)
                 {
-                    Pic<uchar> pimg;
-                    if(capID == CAM_CAP){
-                        pimg.createToGray(temp,3);
-                    }else if(capID == PIC_CAP){
-                        pimg.createToGray(temp,4);
-                    }
-                    int predict = cnn->test_Pic(pimg);
-                    custdata.replybuffer.number = predict;
+                    custdata.replybuffer.state = 0;
                 }
-                custdata.replybuffer.similarity = custdata.replybuffer.similarity % 101;
-                custdata.replybuffer.id = blockid;
-                custdata.replybuffer.width  = temp.width();
-                custdata.replybuffer.height = temp.height();
-                custdata.replybuffer.left   = rec.left();
-                custdata.replybuffer.up     = rec.top();
+                else if(res > -0.1f)
+                {
+                    custdata.replybuffer.state = 1;
+                }
+                else
+                {
+                    custdata.replybuffer.state = 0xff;
+                }
+                custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f);
+                qDebug() << res << res * 100.0f << custdata.replybuffer.similarity;
 
-                array.append((char *)(&(custdata.replybuffer)), sizeof(custdata.replybuffer));
-                totalblock++;
-
-                qDebug() << "totalblock:" << totalblock;
             }
+            else if(action.compare(RECOG_PROC) == 0)
+            {
+                Pic<uchar> pimg;
+                if(capID == CAM_CAP){
+                    pimg.createToGray(temp,3);
+                }else if(capID == PIC_CAP){
+                    pimg.createToGray(temp,4);
+                }
+                int predict = cnn->test_Pic(pimg);
+                custdata.replybuffer.number = predict;
+            }
+            custdata.replybuffer.similarity = custdata.replybuffer.similarity % 101;
+            custdata.replybuffer.id = blockid;
+            custdata.replybuffer.width  = temp.width();
+            custdata.replybuffer.height = temp.height();
+            custdata.replybuffer.left   = rec.left();
+            custdata.replybuffer.up     = rec.top();
+
+            array.append((char *)(&(custdata.replybuffer)), sizeof(custdata.replybuffer));
+            totalblock++;
+            qDebug() << "totalblock:" << totalblock;
         }
+    }
 
-        array.append((char *)(image.bits()), image.width() * image.height() * 3);
-        *(array.data() + 4) = totalblock & 0xff;
-        totallen = array.size();
+    uint *src = new uint[image.width()*image.height()];
+    if(capID == CAM_CAP){
+        TUtil::convertToRGBA(image,src,3);
+    }else if(capID == PIC_CAP){
+        TUtil::convertToRGBA(image,src,4);
+    }
 
-        *(UINT32 *)(array.data()) = totallen;
+    array.append((char *)src);
+    totallen = array.size();
 
-        qDebug() << "array:" << (int)array.at(0) << (int)array.at(1) << (int)array.at(2) << (int)array.at(3) << (int)array.at(4);
-        tcpworker->doprocessimage = 0;
-        tcpworker->sendCmd(array.data(), array.size());
-        qDebug() << "array:" << array.size();
+    *(UINT32 *)(array.data()) = totallen;
+    *(UINT32 *)(array.data()+4) = totalblock;
 
+    qDebug() << "array:" << (int)array.at(0) << (int)array.at(1) << (int)array.at(2) << (int)array.at(3) ;
+    qDebug() << "array:" << (int)array.at(4) << (int)array.at(5) << (int)array.at(6) << (int)array.at(7) ;
+    tcpworker->doprocessimage = 0;
+    tcpworker->sendCmd(array.data(), array.size());
+    delete []src;
 }
 
 void MainWindow::initNet()

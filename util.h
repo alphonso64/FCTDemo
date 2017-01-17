@@ -1,12 +1,13 @@
-#ifndef UTIL_H
-#define UTIL_H
+#ifndef TUTIL_H
+#define TUTIL_H
 #include <QImage>
 
-class Util
+class TUtil
 {
 public:
-    Util();
+    TUtil();
     static void imageFormat(QImage *image,QColor color);
+    static void convertToRGBA(QImage image,uint *dst,int depth);
 };
 
 #endif // UTIL_H
