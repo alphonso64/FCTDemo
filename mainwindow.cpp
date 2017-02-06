@@ -416,14 +416,15 @@ void MainWindow::proecssBlock(int n )
 
     uint *src = new uint[image.width()*image.height()];
     if(capID == CAM_CAP){
-        TUtil::convertToRGBA(image,src,3);
+        TUtil::camconvertToRGBA(image,src);
     }else if(capID == PIC_CAP){
-        TUtil::convertToRGBA(image,src,4);
+        TUtil::bmpconvertToRGBA(image,src);
     }
 
-    array.append((char *)src);
+    array.append((char *)src,image.width()*image.height()*4);
     totallen = array.size();
 
+    qDebug()<<totallen;
     *(UINT32 *)(array.data()) = totallen;
     *(UINT32 *)(array.data()+4) = totalblock;
 

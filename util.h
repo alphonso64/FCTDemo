@@ -7,7 +7,8 @@ class TUtil
 public:
     TUtil();
     static void imageFormat(QImage *image,QColor color);
-    static void convertToRGBA(QImage image,uint *dst,int depth);
+    static void bmpconvertToRGBA(QImage image,uint *dst);
+    static void camconvertToRGBA(QImage image,uint *dst);
 };
 
 #endif // UTIL_H
