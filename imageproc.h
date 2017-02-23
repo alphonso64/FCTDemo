@@ -14,7 +14,7 @@ class ImageProc
 {
 public:
     ImageProc();
-
+    ~ImageProc();
     int initCamera();
     int startCapture();
     void closeCamera();

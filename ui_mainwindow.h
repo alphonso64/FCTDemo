@@ -13,6 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
+#include <QtWidgets/QComboBox>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -48,6 +49,7 @@ public:
     QGroupBox *groupBox;
     QPushButton *camButton;
     QPushButton *picButton;
+    QPushButton *calibrationButton;
     QGroupBox *groupBox_2;
     QPushButton *loadFileButton;
     QPushButton *saveFileButton;
@@ -58,8 +60,10 @@ public:
     QPushButton *recButton;
     QPushButton *saveButton;
     QPushButton *savePicButton;
+    QPushButton *addTransButton;
     QGroupBox *groupBox_4;
     QPushButton *captureButton;
+    QComboBox *comboBox;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -142,7 +146,7 @@ public:
         widget_2->setObjectName(QStringLiteral("widget_2"));
         groupBox = new QGroupBox(widget_2);
         groupBox->setObjectName(QStringLiteral("groupBox"));
-        groupBox->setGeometry(QRect(10, 0, 121, 91));
+        groupBox->setGeometry(QRect(10, 0, 121, 131));
         groupBox->setStyleSheet(QStringLiteral(""));
         camButton = new QPushButton(groupBox);
         camButton->setObjectName(QStringLiteral("camButton"));
@@ -159,9 +163,16 @@ public:
 "QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
 "QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
 "QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}"));
+        calibrationButton = new QPushButton(groupBox);
+        calibrationButton->setObjectName(QStringLiteral("calibrationButton"));
+        calibrationButton->setGeometry(QRect(15, 90, 91, 31));
+        calibrationButton->setStyleSheet(QLatin1String("QPushButton:checked{background-color: rgba(38, 166, 154,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}"));
         groupBox_2 = new QGroupBox(widget_2);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(10, 100, 120, 91));
+        groupBox_2->setGeometry(QRect(10, 140, 120, 91));
         loadFileButton = new QPushButton(groupBox_2);
         loadFileButton->setObjectName(QStringLiteral("loadFileButton"));
         loadFileButton->setGeometry(QRect(15, 10, 91, 31));
@@ -174,7 +185,7 @@ public:
         saveFileButton->setFont(font);
         groupBox_3 = new QGroupBox(widget_2);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 200, 120, 321));
+        groupBox_3->setGeometry(QRect(10, 240, 120, 291));
         addButton = new QPushButton(groupBox_3);
         addButton->setObjectName(QStringLiteral("addButton"));
         addButton->setGeometry(QRect(15, 10, 91, 31));
@@ -184,31 +195,41 @@ public:
 "QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}"));
         delButton = new QPushButton(groupBox_3);
         delButton->setObjectName(QStringLiteral("delButton"));
-        delButton->setGeometry(QRect(15, 50, 91, 31));
+        delButton->setGeometry(QRect(15, 90, 91, 31));
         delButton->setFont(font);
         matchButton = new QPushButton(groupBox_3);
         matchButton->setObjectName(QStringLiteral("matchButton"));
-        matchButton->setGeometry(QRect(15, 90, 91, 31));
+        matchButton->setGeometry(QRect(15, 130, 91, 31));
         matchButton->setFont(font);
         recButton = new QPushButton(groupBox_3);
         recButton->setObjectName(QStringLiteral("recButton"));
-        recButton->setGeometry(QRect(15, 130, 91, 31));
+        recButton->setGeometry(QRect(15, 170, 91, 31));
         recButton->setFont(font);
         saveButton = new QPushButton(groupBox_3);
         saveButton->setObjectName(QStringLiteral("saveButton"));
-        saveButton->setGeometry(QRect(15, 170, 91, 31));
+        saveButton->setGeometry(QRect(15, 210, 91, 31));
         saveButton->setFont(font);
         savePicButton = new QPushButton(groupBox_3);
         savePicButton->setObjectName(QStringLiteral("savePicButton"));
-        savePicButton->setGeometry(QRect(15, 210, 91, 31));
+        savePicButton->setGeometry(QRect(15, 250, 91, 31));
         savePicButton->setFont(font);
+        addTransButton = new QPushButton(groupBox_3);
+        addTransButton->setObjectName(QStringLiteral("addTransButton"));
+        addTransButton->setGeometry(QRect(15, 50, 91, 31));
+        addTransButton->setFont(font);
+        addTransButton->setStyleSheet(QLatin1String("QPushButton:checked{background-color: rgba(38, 166, 154,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}"));
         groupBox_4 = new QGroupBox(widget_2);
         groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
-        groupBox_4->setGeometry(QRect(10, 540, 120, 80));
+        groupBox_4->setGeometry(QRect(10, 540, 120, 61));
         captureButton = new QPushButton(groupBox_4);
         captureButton->setObjectName(QStringLiteral("captureButton"));
-        captureButton->setGeometry(QRect(10, 20, 101, 41));
+        captureButton->setGeometry(QRect(10, 10, 101, 41));
         captureButton->setFont(font);
+        comboBox = new QComboBox(widget_2);
+        comboBox->setObjectName(QStringLiteral("comboBox"));
+        comboBox->setGeometry(QRect(30, 530, 81, 20));
 
         verticalLayout->addWidget(widget_2);
 
@@ -247,6 +268,7 @@ public:
         groupBox->setTitle(QString());
         camButton->setText(QApplication::translate("MainWindow", "\346\221\204\345\203\217\345\244\264", Q_NULLPTR));
         picButton->setText(QApplication::translate("MainWindow", "\345\233\276\347\211\207", Q_NULLPTR));
+        calibrationButton->setText(QApplication::translate("MainWindow", "\346\240\241\345\207\206", Q_NULLPTR));
         groupBox_2->setTitle(QString());
         loadFileButton->setText(QApplication::translate("MainWindow", "\350\275\275\345\205\245\346\265\201\347\250\213\346\226\207\344\273\266", Q_NULLPTR));
         saveFileButton->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\346\265\201\347\250\213\346\226\207\344\273\266", Q_NULLPTR));
@@ -257,6 +279,7 @@ public:
         recButton->setText(QApplication::translate("MainWindow", "\350\257\206\345\210\253", Q_NULLPTR));
         saveButton->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\346\250\241\346\235\277", Q_NULLPTR));
         savePicButton->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\345\233\276\347\211\207", Q_NULLPTR));
+        addTransButton->setText(QApplication::translate("MainWindow", "\346\241\206\351\200\211\344\274\240\350\276\223\345\214\272\345\237\237", Q_NULLPTR));
         groupBox_4->setTitle(QString());
         captureButton->setText(QApplication::translate("MainWindow", "\346\243\200\346\265\213", Q_NULLPTR));
     } // retranslateUi

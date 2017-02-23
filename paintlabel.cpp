@@ -22,5 +22,5 @@ void PaintLabel::paintEvent(QPaintEvent *event)
         p.drawText(rec.topLeft(), QString::number(iter.key()));
         p.setPen(QPen(Qt::red, 1));
     }
-    qDebug()<<"PaintLabel paintEvent";
+   // qDebug()<<"PaintLabel paintEvent";
 }

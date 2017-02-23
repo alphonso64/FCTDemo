@@ -18,6 +18,8 @@ public:
     CusLabel();
     void enableRect();
     void disableRect();
+    void enableTransRect();
+    void disableTransRect();
     Regular* getRegular();
 
 signals:
@@ -35,6 +37,11 @@ private:
     bool drawflag;
     QPoint startPoint;
     QPoint endPoint;
+
+    bool trans_startflag;
+    bool trans_drawflag;
+    QPoint trans_startPoint;
+    QPoint trans_endPoint;
 };
 
 #endif // CUSLABEL_H

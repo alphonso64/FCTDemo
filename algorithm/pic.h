@@ -154,10 +154,11 @@ void Pic<T>::min_max(T& min, T& max, m_point& minPoint, m_point& maxPoint)
 		}
 	}
 }
+
 ////////////////////some function////////////////////////
 template<typename T>
 Pic<T> roi(Pic<T> img,int x,int y,int width,int height);
-int __round(double val);
+int round_cus(double val);
 template<typename T>
 Pic<T> roi(Pic<T> img,int x,int y,int width,int height)
 {

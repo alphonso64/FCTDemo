@@ -18,6 +18,15 @@ ImageProc::ImageProc()
 
 }
 
+ImageProc::~ImageProc()
+{
+    if(m_pImgBuffer!=NULL)
+    {
+        delete [] m_pImgBuffer;
+        m_pImgBuffer = NULL;
+    }
+}
+
 int ImageProc::initCamera()
 {
     GX_STATUS      emStatus    = GX_STATUS_SUCCESS;
@@ -26,11 +35,9 @@ int ImageProc::initCamera()
     bool           bRet;
 
     emStatus = GXInitLib();
-    qDebug()<<"init lib";
     GX_VERIFY(emStatus);
 
-    emStatus = GXUpdateDeviceList(&nDevNum, 1000);
-    qDebug()<<"GXUpdateDeviceList";
+    emStatus = GXUpdateDeviceList(&nDevNum, 1000);\
     GX_VERIFY(emStatus);
 
     qDebug()<<nDevNum;
@@ -47,37 +54,26 @@ int ImageProc::initCamera()
     }
 
     emStatus = OpenDevice();
-    qDebug()<<"open";
     GX_VERIFY(emStatus);
 
     emStatus = InitDevice();
-    qDebug()<<"init";
     GX_VERIFY(emStatus);
 
     emStatus = GetDeviceInitParam();
-    qDebug()<<"initpara";
     GX_VERIFY(emStatus);
 
-    qDebug()<<"PrepareForShowImg";
     bRet = PrepareForShowImg();
     if (!bRet)
     {
         return FAIL;
     }
-
     m_bIsOpen = true;
-
     emStatus = GXSendCommand(m_hDevice,GX_COMMAND_ACQUISITION_START);
     GX_VERIFY(emStatus);
-
         // 更新开采标识
     m_bIsSnap = true;
-
     emStatus = GXSetEnum(m_hDevice,GX_ENUM_BALANCE_WHITE_AUTO,GX_BALANCE_WHITE_AUTO_CONTINUOUS);
-
-
     return SUCCESS;
-
 }
 
 int ImageProc::startCapture()

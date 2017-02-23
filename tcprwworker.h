@@ -34,6 +34,9 @@ private:
     void processCmd(QByteArray * array);
 signals:
     void processImg(int id);
+    void loadPatternFile(int code);
+    void selectImageSrc(int code);
+    void changeImage(int code);
 };
 
 #endif // TCPRWWORKER_H

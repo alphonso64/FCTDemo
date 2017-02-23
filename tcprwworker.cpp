@@ -3,29 +3,9 @@
 
 void TCPRWWorker::run()
 {
-
-    //listenSocket->listen(QHostAddress::AnyIPv4, 8888);
-
-    connect(listenSocket, SIGNAL(newConnection()), this, SLOT(processConnection()));
-
     qDebug() << "waiting...";
+    connect(listenSocket, SIGNAL(newConnection()), this, SLOT(processConnection()));
     this->exec();
-    //qDebug() << "start...";
-    //this->exec();
-
-//    QString theqstring;
-
-//    while(!isthreadstopped)
-//    {
-//        theqstring.clear();
-//        theqstring = readWriteSocket->readAll();
-//        if(theqstring.size() != 0)
-//        {
-//            qDebug() << theqstring;
-//            readWriteSocket->write("ok");
-//        }
-//        //msleep(50);
-//    }
 }
 
 void  TCPRWWorker::processConnection()
@@ -33,26 +13,25 @@ void  TCPRWWorker::processConnection()
     readWriteSocket = listenSocket->nextPendingConnection();
     connect(readWriteSocket, SIGNAL(readyRead()), this, SLOT(processText()));
     qDebug() << readWriteSocket->peerAddress();
-    qDebug() << "start...";
-    //exit();
+    qDebug() << "new  Connection...";
 }
 
 void  TCPRWWorker::sendCmd(char * buf, int len)
 {
+    qDebug()<<"sned msg";
     readWriteSocket->write(buf, len);
 }
 
 void  TCPRWWorker::processText()
 {
+    qDebug() << "processText";
     QByteArray bytearray;
     bytearray = readWriteSocket->readAll();
     processCmd(&bytearray);
-    //readWriteSocket->write("ok");
 }
 
 void TCPRWWorker::processCmd(QByteArray * array)
 {
-    QByteArray header = "S84C";
     uchar  len;
     int i;
     int blockid;
@@ -73,5 +52,17 @@ void TCPRWWorker::processCmd(QByteArray * array)
         }
         doprocessimage = 1;
         emit processImg(blockid);
+    }else if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'D')
+    {
+        int  code= array->at(4) + (array->at(5) << 8) + (array->at(6) << 16) + (array->at(7) << 24) ;
+        emit loadPatternFile(code);
+    }else if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'E')
+    {
+        int  code= array->at(4) + (array->at(5) << 8) + (array->at(6) << 16) + (array->at(7) << 24) ;
+        emit selectImageSrc(code);
+    }else if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'F')
+    {
+        int  code= array->at(4) + (array->at(5) << 8) + (array->at(6) << 16) + (array->at(7) << 24) ;
+        emit changeImage(code);
     }
 }

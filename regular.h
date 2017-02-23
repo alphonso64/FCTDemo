@@ -16,6 +16,7 @@ public:
     QMap<int, CusRect> recMap;
     QMap<int, QString> actionMap;
     QMap<int, PatternFile> tempsMap;
+    CusRect transRec;
     void savePatam2File(QString path);
     void update(QString path);
     int mapIndex;

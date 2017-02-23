@@ -25,6 +25,16 @@ void CusLabel::disableRect()
     drawflag = false;
 }
 
+void CusLabel::enableTransRect()
+{
+    trans_drawflag = true;
+}
+void CusLabel::disableTransRect()
+{
+    trans_drawflag = false;
+}
+
+
 
 void CusLabel::paintEvent(QPaintEvent *e)
 {
@@ -39,6 +49,15 @@ void CusLabel::paintEvent(QPaintEvent *e)
             p.drawRect(QRect(startPoint, endPoint));
         }
     }
+    if (trans_startflag)
+    {
+        p.setPen(QPen(Qt::yellow, 1));
+        if (trans_startPoint != trans_endPoint)
+        {
+            p.drawRect(QRect(trans_startPoint, trans_endPoint));
+        }
+        p.setPen(QPen(Qt::red, 1));
+    }
     while (iter.hasNext())
     {
         iter.next();
@@ -47,6 +66,12 @@ void CusLabel::paintEvent(QPaintEvent *e)
         p.drawRect(rec);
         p.setPen(QPen(Qt::blue, 1));
         p.drawText(rec.topLeft(), QString::number(iter.key()));
+        p.setPen(QPen(Qt::red, 1));
+    }
+    {
+        p.setPen(QPen(Qt::yellow, 1));
+        QRect rec = regular->transRec.getRect(this->width(), this->height());
+        p.drawRect(rec);
         p.setPen(QPen(Qt::red, 1));
     }
 }
@@ -61,10 +86,19 @@ void CusLabel::mousePressEvent(QMouseEvent *event)
         endPoint.setX(event->x());
         endPoint.setY(event->y());
     }
+    if(trans_drawflag)
+    {
+        trans_startflag = true;
+        trans_startPoint.setX(event->x());
+        trans_startPoint.setY(event->y());
+        trans_endPoint.setX(event->x());
+        trans_endPoint.setY(event->y());
+    }
 }
 
 void CusLabel::mouseReleaseEvent(QMouseEvent *event)
 {
+
     if (startflag)
     {
         startflag = false;
@@ -76,6 +110,18 @@ void CusLabel::mouseReleaseEvent(QMouseEvent *event)
             regular->tempsMap.insert(regular->mapIndex, PatternFile());
             regular->actionMap.insert(regular->mapIndex++, " ");
             emit ListChanged(regular->recMap,regular->actionMap);
+            update();
+        }
+    }
+
+    if (trans_startflag)
+    {
+        trans_startflag = false;
+        trans_endPoint.setX(event->x());
+        trans_endPoint.setY(event->y());
+        if (trans_startPoint != trans_endPoint)
+        {
+            regular->transRec = CusRect(trans_startPoint, trans_endPoint, this->width(), this->height());
             update();
         }
     }
@@ -94,6 +140,20 @@ void CusLabel::mouseMoveEvent(QMouseEvent *event){
             if (startflag){
                 endPoint.setX(x);
                 endPoint.setY(y);
+            }
+            update();
+        }
+    }
+
+    if(trans_drawflag)
+    {
+        if (x<0 || x>this->width() || y<0 || y>this->height()){
+            trans_startflag = false;
+        }
+        else{
+            if (trans_startflag){
+                trans_endPoint.setX(x);
+                trans_endPoint.setY(y);
             }
             update();
         }

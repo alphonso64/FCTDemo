@@ -29,6 +29,11 @@ void Regular::update(QString path)
     tempsMap.clear();
     int temp = 0;
     QSettings *settings = new QSettings(path+"/config", QSettings::IniFormat);
+    float x1 = settings->value("trans_x1").toFloat();
+    float x2 = settings->value("trans_x2").toFloat();
+    float y1 = settings->value("trans_y1").toFloat();
+    float y2 = settings->value("trans_y2").toFloat();
+    transRec = CusRect(x1,y1,x2,y2);
     int size = settings->beginReadArray(PARAM_ARRAY);
     qDebug()<<"update"<<size;
     for (int i = 0; i < size; ++i) {
@@ -92,6 +97,10 @@ void Regular::savePatam2File(QString path)
         mFile.remove();
     }
     QSettings *settings = new QSettings(path+"/config", QSettings::IniFormat);
+    settings->setValue("trans_x1",  QString("%1").arg(transRec.x1));
+    settings->setValue("trans_x2",  QString("%1").arg(transRec.x2));
+    settings->setValue("trans_y1",  QString("%1").arg(transRec.y1));
+    settings->setValue("trans_y2",  QString("%1").arg(transRec.y2));
     settings->beginWriteArray(PARAM_ARRAY);
     QMapIterator<int, CusRect> iter(recMap);
     int i=0;

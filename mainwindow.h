@@ -12,6 +12,7 @@
 #include "CusRect.h"
 #include <QButtonGroup>
 #include <QLabel>
+#include <QPainter>
 using namespace std;
 
 #pragma execution_character_set("utf-8")
@@ -31,6 +32,7 @@ public:
 private slots:
     void CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> actionMap);
     void AddClick(bool flag);
+    void AddTransClick(bool flag);
     void DelClick();
     void MatchClick();
     void RecogClick();
@@ -41,31 +43,35 @@ private slots:
     void saveimg();
     void camInitRdy(int);
     void camSelect(int);
+    void selectImageSrc(int);
+    void changeImage(int);
+    void loadPatternFile(int);
     void on_savePicButton_clicked();
-
     void on_saveFileButton_clicked();
-
     void on_loadFileButton_clicked();
+    void changeMode();
 
 private:
     void initNet();
     void send2Client();
     void tcpstartrw();
-    void replytoclient();
     void updateStatusBar(int state);
     void updateStatusBar();
+    void addOp(QPainter::CompositionMode mode, const QString &name);
 
     Ui::MainWindow *ui;
     int capID;
+    bool caliFlag;
+    QPixmap caliImage;
     QButtonGroup group;
     CNN *cnn;
     TCPRWWorker * tcpworker;
     QVector<CusReplyData> vect;
     CusCamera *cuscamera;
     QImage image;
-    QImage detetcImage;
     QLabel *statusLabel;
     QLabel *statusLabel_;
+    QPainter::CompositionMode mode;
 public:
 
 };

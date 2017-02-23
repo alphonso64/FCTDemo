@@ -31,7 +31,6 @@ void CusCamera::run()
 
 void CusCamera::timeOut()
 {
-//    qDebug()<<"cap";
     imageproc->SendCaptureCommand();
     emit(capRdy());
 }
