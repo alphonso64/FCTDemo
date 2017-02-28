@@ -1,8 +1,9 @@
-﻿#ifndef PIC_H
+#ifndef PIC_H
 #define PIC_H
 #include "m_size.h"
 #include "m_point.h"
 #include "scalar.h"
+#include <algorithm>
 #include <QImage>
 typedef  unsigned char uchar;
 
@@ -16,13 +17,15 @@ public:
 	int channels;
 
 	Pic();
+	~Pic();
 	Pic(int cols,int rows);
 	Pic(m_size size);
 	void create(int size);
-    void createToGray(QImage image,int depth);
 	void create(int col,int row);
 	void create(int col,int row,int channel);
 	void create(m_size size);
+    void createToGray(QImage image,int depth);
+	void release();
 	void all(T num=0);
 	void min_max(T& min, T& max, m_point& minPoint, m_point& maxPoint);
 	m_size size();
@@ -34,6 +37,16 @@ public:
 /////////////////////////////////////pic//////////////////////////////
 template<typename T>
 Pic<T>::Pic():rows(0),cols(0),step(0),channels(1){}
+template<typename T>
+Pic<T>::~Pic(){}
+template<typename T>
+void Pic<T>::release(){
+        if(data != NULL)
+        {
+            delete[] data;
+            data = NULL;
+        }
+	}
 template<typename T>
 Pic<T>::Pic(int col, int row)
 {
@@ -53,21 +66,6 @@ Pic<T>::Pic(m_size size)
 	channels=1;
 }
 template<typename T>
-void Pic<T>::create(int size)
-{
-	data=new T[size];
-}
-template<typename T>
-void Pic<T>::create(int col, int row)
-{
-	data=new T[col*row];
-	step=col;
-	rows=row;
-	cols=col;
-	channels=1;
-}
-
-template<typename T>
 void Pic<T>::createToGray(QImage image,int depth)
 {
     data=new T[image.height()*image.width()];
@@ -85,7 +83,20 @@ void Pic<T>::createToGray(QImage image,int depth)
         }
     }
 }
-
+template<typename T>
+void Pic<T>::create(int size)
+{
+	data=new T[size];
+}
+template<typename T>
+void Pic<T>::create(int col, int row)
+{
+	data=new T[col*row];
+	step=col;
+	rows=row;
+	cols=col;
+	channels=1;
+}
 template<typename T>
 void Pic<T>::create(int col, int row, int channel)
 {
@@ -154,11 +165,10 @@ void Pic<T>::min_max(T& min, T& max, m_point& minPoint, m_point& maxPoint)
 		}
 	}
 }
-
 ////////////////////some function////////////////////////
 template<typename T>
 Pic<T> roi(Pic<T> img,int x,int y,int width,int height);
-int round_cus(double val);
+int cus_round(double val);
 template<typename T>
 Pic<T> roi(Pic<T> img,int x,int y,int width,int height)
 {

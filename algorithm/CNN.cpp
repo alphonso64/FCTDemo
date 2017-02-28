@@ -2,7 +2,7 @@
 #include "vector"
 #include "iostream"
 #include "match_util.h"
-#include "const_define.h"
+#include <const_define.h>
 using namespace std;
 #define DSIGMOID(S) (S*(1-S)) // derivative of the sigmoid as a function of the sigmoid's output
 void CNN::train(double ***train_x,double** train_label,int NumOfImage)
@@ -741,95 +741,95 @@ void CNN::test_o(double*** test_x,double** test_label, int number)
 
 void CNN::load_weight()
 {
-	layers::iterator iter = m_layers.begin();
-	iter++;
-	double ****m_kernel=(*iter).kernel;
-	double *m_bias=(*iter).bias;
-	int i,j,k,l;
-	FILE *fp;
-	//load the first conv layer weight and bias
+    layers::iterator iter = m_layers.begin();
+    iter++;
+    double ****m_kernel=(*iter).kernel;
+    double *m_bias=(*iter).bias;
+    int i,j,k,l;
+    FILE *fp;
+    //load the first conv layer weight and bias
      if((fp=fopen(LAYER_1_KERNEL,"rt"))==NULL)
-	 {
-		  printf("cannot open conv1_w\n");
-	 }
-	 for(i=0;i<6;i++){
-		 for(j=0;j<5;j++){
-			 for(k=0;k<5;k++){
-				  fscanf(fp,"%lf",&m_kernel[0][i][j][k]);
-				  fscanf(fp,"\n");
-			 }
-		 }
-	 }
-	 fclose(fp);
+     {
+          printf("cannot open conv1_w\n");
+     }
+     for(i=0;i<6;i++){
+         for(j=0;j<5;j++){
+             for(k=0;k<5;k++){
+                  fscanf(fp,"%lf",&m_kernel[0][i][j][k]);
+                  fscanf(fp,"\n");
+             }
+         }
+     }
+     fclose(fp);
      if((fp=fopen(LAYER_1_BIAS,"rt"))==NULL)
-	 {
-		  printf("cannot open conv1_b\n");
-	 }
-	  for(i=0;i<6;i++)
-	  {
-	       fscanf(fp,"%lf",&m_bias[i]);
-		   fscanf(fp,"\n");
-	  }
-	  fclose(fp);
-	  //load the second conv layer weight and bias
-	  iter++;iter++;
+     {
+          printf("cannot open conv1_b\n");
+     }
+      for(i=0;i<6;i++)
+      {
+           fscanf(fp,"%lf",&m_bias[i]);
+           fscanf(fp,"\n");
+      }
+      fclose(fp);
+      //load the second conv layer weight and bias
+      iter++;iter++;
       m_kernel=(*iter).kernel;
-	  m_bias=(*iter).bias;
+      m_bias=(*iter).bias;
        if((fp=fopen(LAYER_2_KERNEL,"rt"))==NULL)
-	 {
-		  printf("cannot open conv2_w\n");
-	 }
-	 for(i=0;i<6;i++){
-		 for(j=0;j<12;j++){
-			 for(k=0;k<5;k++){
-				 for(l=0;l<5;l++){
-					  fscanf(fp,"%lf",&m_kernel[i][j][k][l]);
-					  fscanf(fp,"\n");
-				 }
-			 }
-		 }
-	 }
-	 fclose(fp);
+     {
+          printf("cannot open conv2_w\n");
+     }
+     for(i=0;i<6;i++){
+         for(j=0;j<12;j++){
+             for(k=0;k<5;k++){
+                 for(l=0;l<5;l++){
+                      fscanf(fp,"%lf",&m_kernel[i][j][k][l]);
+                      fscanf(fp,"\n");
+                 }
+             }
+         }
+     }
+     fclose(fp);
      if((fp=fopen(LAYER_2_BIAS,"rt"))==NULL)
-	 {
-		  printf("cannot open conv2_b\n");
-	 }
-	  for(i=0;i<12;i++)
-	  {
-	       fscanf(fp,"%lf",&m_bias[i]);
-		   fscanf(fp,"\n");
-	  }
-	  fclose(fp);
-	  //load the third conv layer weight and bias
-	  iter++;iter++;
+     {
+          printf("cannot open conv2_b\n");
+     }
+      for(i=0;i<12;i++)
+      {
+           fscanf(fp,"%lf",&m_bias[i]);
+           fscanf(fp,"\n");
+      }
+      fclose(fp);
+      //load the third conv layer weight and bias
+      iter++;iter++;
       m_kernel=(*iter).kernel;
-	  m_bias=(*iter).bias;
+      m_bias=(*iter).bias;
        if((fp=fopen(LAYER_3_KERNEL,"rt"))==NULL)
-	 {
-		  printf("cannot open conv3_w\n");
-	 }
-	 for(i=0;i<12;i++){
-		 for(j=0;j<10;j++){
-			 for(k=0;k<4;k++){
-				 for(l=0;l<4;l++){
-					  fscanf(fp,"%lf",&m_kernel[i][j][k][l]);
-					  fscanf(fp,"\n");
-				 }
-			 }
-		 }
-	 }
-	 fclose(fp);
+     {
+          printf("cannot open conv3_w\n");
+     }
+     for(i=0;i<12;i++){
+         for(j=0;j<10;j++){
+             for(k=0;k<4;k++){
+                 for(l=0;l<4;l++){
+                      fscanf(fp,"%lf",&m_kernel[i][j][k][l]);
+                      fscanf(fp,"\n");
+                 }
+             }
+         }
+     }
+     fclose(fp);
      if((fp=fopen(LAYER_3_BIAS,"rt"))==NULL)
-	 {
-		  printf("cannot open conv3_b\n");
-	 }
-	  for(i=0;i<10;i++)
-	  {
-	       fscanf(fp,"%lf",&m_bias[i]);
-		   fscanf(fp,"\n");
-	  }
-	  fclose(fp);
-	  cout<<"CNN_load_weight success"<<endl;
+     {
+          printf("cannot open conv3_b\n");
+     }
+      for(i=0;i<10;i++)
+      {
+           fscanf(fp,"%lf",&m_bias[i]);
+           fscanf(fp,"\n");
+      }
+      fclose(fp);
+          //cout<<"CNN_load_weight success"<<endl;
 }
 
 //int CNN::test_pic(char* name)
@@ -895,6 +895,11 @@ int CNN::test_Pic(Pic<uchar> img)
 	{
 		predict = findIndex((*iter).outputmaps[ii]);
 	}
+	img2.release();
+	for(int i=0;i<Len;i++)
+		delete[] test[0][i];
+	delete[] test[0];
+	delete[] test;
 	return predict;
 }
 

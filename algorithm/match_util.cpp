@@ -133,8 +133,22 @@ vector<Pic<uchar>> make_temps(Pic<uchar> temp){
 			m_rotate(scale_image,scale_angle_image,angle[j]);
 			temps.push_back(scale_angle_image);
 		}
+		scale_image.release();
 	}
+	img.release();
 	return temps;
+}
+
+void release(vector<Pic<uchar>> temps)
+{
+	for(int i=0;i<temps.size();i++){
+        if(temps[i].data!=NULL)
+        {
+            qDebug()<<"pattern.temps release"<<temps[i].data;
+            delete [] temps[i].data;
+            temps[i].data = NULL;
+        }
+	}
 }
 
 //////////////////////////////////////////resize//////////////////////////////////////
@@ -197,7 +211,7 @@ void m_resize(Pic<uchar> src, Pic<uchar> &dst, int cols, int rows)
 }
 
 ////////////////////二值图匹配/////////////////////////////////////////////////
-double mul_tempRoi(Pic<uchar> img, vector<Pic<uchar>> temps, int MatchMethod)
+double mul_tempRoi(Pic<uchar> _img, vector<Pic<uchar>> temps, int MatchMethod)
 {
 		/***********************************************
 		【0】- 平方差匹配法(SQDIFF)
@@ -208,9 +222,8 @@ double mul_tempRoi(Pic<uchar> img, vector<Pic<uchar>> temps, int MatchMethod)
 		【5】- 归一化相关系数匹配法(TM COEFF NORMED)
 		*************************************************/
 	//cvtColor(img,img,CV_RGB2GRAY);
-	m_threshold(img, img, TH);
-    qDebug()<<"rows "<<img.cols<<" "<<temps[0].cols;
-    qDebug()<<"col "<<img.rows<<" "<<temps[0].rows;
+	Pic<uchar> img;
+	m_threshold(_img, img, TH);
     if((img.cols<temps[0].cols)|(img.rows<temps[0].rows)){
 
 		return -1;         //模板大于匹配区域
@@ -221,26 +234,26 @@ double mul_tempRoi(Pic<uchar> img, vector<Pic<uchar>> temps, int MatchMethod)
 	m_point minLocation; m_point maxLocation;
 	/*  定义结果图的大小*/
 	for(int i=0;i<9;i++){
-		int resultImage_cols =  img.cols - temps[i].cols + 1;
-		int resultImage_rows = img.rows - temps[i].rows + 1;
-		result.create( resultImage_cols, resultImage_rows);
-
 		m_matchTemplate( img, temps[i], result, MatchMethod );      //匹配
-	
+
 		//min_max( result, &minValue, &maxValue, &minLocation, &maxLocation, Mat() );
 		result.min_max(minValue,maxValue,minLocation,maxLocation);
 		minValues.push_back(minValue);
 		maxValues.push_back(maxValue);
+		result.release();
 	}
 	//根据匹配模式取值
 	if( MatchMethod  == TM_SQDIFF || MatchMethod == TM_SQDIFF_NORMED )
 	{ 
 		vector<float>::iterator smallest=min_element(minValues.begin(),minValues.end());
+		img.release();
 		return *smallest; 
 	}
 	else
 	{ 
 		vector<float>::iterator biggest=max_element(maxValues.begin(),maxValues.end());
+		img.release();
 		return *biggest; 
 	}
+	
 }

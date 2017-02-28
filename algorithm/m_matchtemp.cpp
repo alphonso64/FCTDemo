@@ -1,4 +1,4 @@
-﻿#include "m_matchtemp.h"
+#include "m_matchtemp.h"
 #include "pic.h"
 #include "iostream"
 void m_matchTemplate( Pic<uchar> img, Pic<uchar>& templ, Pic<float>& result, int method)
@@ -18,7 +18,6 @@ void m_matchTemplate( Pic<uchar> img, Pic<uchar>& templ, Pic<float>& result, int
         std::swap(img, templ);
 
     m_size corrSize(img.cols - templ.cols + 1, img.rows - templ.rows + 1);
-    result.create(corrSize);
 
     m_crossCorr( img, templ, result, corrSize);
 
@@ -125,4 +124,6 @@ void m_matchTemplate( Pic<uchar> img, Pic<uchar>& templ, Pic<float>& result, int
             rrow[j] = (float)num;
         }
     }
+	sum.release();
+	sqsum.release();
 }

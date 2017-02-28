@@ -1,5 +1,7 @@
 #include "pic.h"
-int round_cus(double val)
+#include "vector"
+using namespace std;
+int cus_round(double val)
 {
 	return (int)(val+0.5);
 }

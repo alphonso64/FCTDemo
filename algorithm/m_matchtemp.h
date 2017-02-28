@@ -1,4 +1,4 @@
-﻿#ifndef M_MATCH_TEMPLATE
+#ifndef M_MATCH_TEMPLATE
 #define M_MATCH_TEMPLATE
 #include "pic.h"
 #include "m_crossCorr.h"

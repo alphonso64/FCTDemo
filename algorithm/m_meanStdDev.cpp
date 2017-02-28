@@ -2,7 +2,6 @@
 #include "pic.h"
 #include "m_autobuffer.h"
 #include "iostream"
-#include <algorithm>
 void m_meanStdDev( Pic<uchar> src, scalar<double>& _mean, scalar<double>& _sdv )
 {
     int k, cn = src.channels, depth = 0;

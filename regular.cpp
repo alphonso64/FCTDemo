@@ -9,6 +9,7 @@ Regular::Regular()
     recMap.clear();
     actionMap.clear();
     tempsMap.clear();
+    transRec = CusRect(0,0,0,0);
     mapIndex = 1;
 }
 
@@ -23,19 +24,31 @@ void Regular::setActionMapContent(int key, QString value)
 
 void Regular::update(QString path)
 {
+    QMapIterator<int, PatternFile> iter(tempsMap);
+
+    while (iter.hasNext())
+    {
+        iter.next();
+        PatternFile pattern = iter.value();
+        pattern.selfRelease();
+    }
+
     pattenPath = path;
     recMap.clear();
     actionMap.clear();
     tempsMap.clear();
+    transRec = CusRect(0,0,0,0);
     int temp = 0;
     QSettings *settings = new QSettings(path+"/config", QSettings::IniFormat);
-    float x1 = settings->value("trans_x1").toFloat();
-    float x2 = settings->value("trans_x2").toFloat();
-    float y1 = settings->value("trans_y1").toFloat();
-    float y2 = settings->value("trans_y2").toFloat();
-    transRec = CusRect(x1,y1,x2,y2);
+    if(settings->contains("trans_x1"))
+    {
+        float x1 = settings->value("trans_x1").toFloat();
+        float x2 = settings->value("trans_x2").toFloat();
+        float y1 = settings->value("trans_y1").toFloat();
+        float y2 = settings->value("trans_y2").toFloat();
+        transRec = CusRect(x1,y1,x2,y2);
+    }
     int size = settings->beginReadArray(PARAM_ARRAY);
-    qDebug()<<"update"<<size;
     for (int i = 0; i < size; ++i) {
         settings->setArrayIndex(i);
         int id = settings->value("id").toInt();
@@ -54,6 +67,13 @@ void Regular::update(QString path)
             Pic<uchar> pimg;
             pimg.createToGray(tempImg,4);
             pattern.temps = make_temps(pimg);
+//            for(int i=0;i<pattern.temps.size();i++){
+//                if(pattern.temps[i].data!=NULL)
+//                {
+//                    qDebug()<<"pattern.temps"<<pattern.temps[i].data;
+//                }
+//            }
+            pimg.release();
         }
         recMap.insert(id,CusRect(x1,y1,x2,y2));
         actionMap.insert(id,action);
@@ -67,6 +87,8 @@ void Regular::setTempsMapContent(int key, PatternFile value)
 {
     if(tempsMap.contains(key))
     {
+        PatternFile pattern = tempsMap.value(key);
+        pattern.selfRelease();
         tempsMap.remove(key);
         tempsMap.insert(key,value);
     }
@@ -84,6 +106,8 @@ void Regular::removeRectMapContent(int key)
     }
     if(tempsMap.contains(key))
     {
+        PatternFile pattern = tempsMap.value(key);
+        pattern.selfRelease();
         tempsMap.remove(key);
     }
 }

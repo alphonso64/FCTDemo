@@ -2,9 +2,10 @@
 
 CusLabel::CusLabel(QWidget *parent):QLabel(parent)
 {
-
     startflag = false;
     drawflag = false;
+    trans_startflag = false;
+    trans_drawflag = false;
     regular = new Regular();
 }
 
@@ -12,6 +13,8 @@ CusLabel::CusLabel()
 {
     startflag = false;
     drawflag = false;
+    trans_startflag = false;
+    trans_drawflag = false;
     regular = new Regular();
 }
 

@@ -392,6 +392,14 @@ void MainWindow::MatchClick()
             Pic<uchar> pimg;
             pimg.createToGray(tempImg,4);
             pattern.temps = make_temps(pimg);
+            pimg.release();
+
+            for(int i=0;i<pattern.temps.size();i++){
+                if(pattern.temps[i].data!=NULL)
+                {
+                    qDebug()<<"pattern.temps"<<pattern.temps[i].data;
+                }
+            }
 
             int key = ui->tableWidget->item(row,0)->text().toInt();
             ui->label_2->getRegular()->setActionMapContent(key,MATCH_PROC);
@@ -450,7 +458,7 @@ void MainWindow::detectClick()
             }
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget->setItem(cnt++, 2, item);
-
+            pimg.release();
         }else if(action.compare(RECOG_PROC) == 0)
         {
             QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
@@ -467,6 +475,7 @@ void MainWindow::detectClick()
             }else{
                 item  = new QTableWidgetItem("error");
             }
+            pimg.release();
 
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget->setItem(cnt++, 2, item);
@@ -483,7 +492,7 @@ void MainWindow::proecssBlock(int n )
 
     uchar totalblock = 0;
     int blockid;
-    CusReplyData  custdata;
+
     UINT32 totallen = 0;
     vect.clear();
     array.append((char *)&totallen, sizeof(totallen));
@@ -509,6 +518,7 @@ void MainWindow::proecssBlock(int n )
 
         if(ui->label_2->getRegular()->recMap.contains(blockid))
         {
+            CusReplyData  custdata;
             CusRect rect = ui->label_2->getRegular()->recMap.value(blockid);
             QRect rec = rect.getRect(image.width(), image.height());
             QImage temp = image.copy(rec);
@@ -536,7 +546,7 @@ void MainWindow::proecssBlock(int n )
                     custdata.replybuffer.state = 0xff;
                 }
                 custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f);
-                qDebug() << res << res * 100.0f << custdata.replybuffer.similarity;
+                pimg.release();
 
             }
             else if(action.compare(RECOG_PROC) == 0)
@@ -548,7 +558,9 @@ void MainWindow::proecssBlock(int n )
                     pimg.createToGray(temp,4);
                 }
                 int predict = cnn->test_Pic(pimg);
+                qDebug()<<"predict"<<predict;
                 custdata.replybuffer.number = predict;
+                pimg.release();
             }
             custdata.replybuffer.similarity = custdata.replybuffer.similarity % 101;
             custdata.replybuffer.id = blockid;
@@ -556,24 +568,18 @@ void MainWindow::proecssBlock(int n )
             custdata.replybuffer.height = temp.height();
             custdata.replybuffer.left   = rec.left();
             custdata.replybuffer.up     = rec.top();
-
             array.append((char *)(&(custdata.replybuffer)), sizeof(custdata.replybuffer));
             totalblock++;
-            qDebug() << "totalblock:" << totalblock;
         }
     }
-
     uint *src = new uint[srcImage.width()*srcImage.height()];
     if(capID == CAM_CAP){
         TUtil::camconvertToRGBA(srcImage,src);
     }else if(capID == PIC_CAP){
         TUtil::bmpconvertToRGBA(srcImage,src);
     }
-
     array.append((char *)src,srcImage.width()*srcImage.height()*4);
     totallen = array.size();
-
-    qDebug()<<"totallen"<<totallen;
     *(UINT32 *)(array.data()) = totallen;
     *(UINT32 *)(array.data()+4) = totalblock;
     *(UINT32 *)(array.data()+8) = srcImage.width();

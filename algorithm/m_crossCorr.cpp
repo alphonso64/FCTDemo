@@ -3,7 +3,6 @@
 #include "m_dft.h"
 #include "pic.h"
 #include "m_mulspectrums.h"
-#include <algorithm>  
 void m_crossCorr( const Pic<uchar>& img, const Pic<uchar>& templ, Pic<float>& corr,
                 m_size corrsize)
 {
@@ -103,4 +102,6 @@ void m_crossCorr( const Pic<uchar>& img, const Pic<uchar>& templ, Pic<float>& co
             src1.convertTo(cdst);
         }
     }
+	dftTempl.release();
+	dftImg.release();
 }

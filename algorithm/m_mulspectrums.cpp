@@ -8,8 +8,6 @@ void m_mulSpectrums( Pic<float> srcA, Pic<float> srcB,
     int rows = srcA.rows, cols = srcA.cols;
     int j, k;
 
-    dst.create( srcA.cols,srcA.rows);
-
     bool is_1d = (flags & m_DFT_ROWS) || (rows == 1 || (cols == 1 &&
              srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous()));
 
