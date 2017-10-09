@@ -10,7 +10,7 @@
 #define SUCCESS 0
 #define FAIL -1
 
-#define LOCALTEST
+//#define LOCALTEST
 
 #ifdef LOCALTEST
 #define LAYER_1_KERNEL "D:\\test1\\conv_layer1_kernel.txt"
@@ -20,7 +20,7 @@
 #define LAYER_2_BIAS "D:\\test1\\conv_layer2_bias.txt"
 #define LAYER_3_BIAS "D:\\test1\\conv_layer3_bias.txt"
 #define TEMPSPATH "D:\\test1\\temps"
-#define PATTERN_FILE_PATH "C:\\Users\\thingword-A\\Desktop\\code.ini"
+#define PATTERN_FILE_PATH "C:\\Users\\alphonso\\Desktop\\code.ini"
 #else
 #define LAYER_1_KERNEL "./bin/conv_layer1_kernel.txt"
 #define LAYER_2_KERNEL "./bin/conv_layer2_kernel.txt"
@@ -29,7 +29,7 @@
 #define LAYER_2_BIAS "./bin/conv_layer2_bias.txt"
 #define LAYER_3_BIAS "./bin/conv_layer3_bias.txt"
 #define TEMPSPATH "./temps"
-#define PATTERN_FILE_PATH "./code.ini"
+#define PATTERN_FILE_PATH "./bin/code.ini"
 #endif
 
 #endif // CONST_DEFINE_H

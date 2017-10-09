@@ -227,6 +227,7 @@ public:
         captureButton->setObjectName(QStringLiteral("captureButton"));
         captureButton->setGeometry(QRect(10, 10, 101, 41));
         captureButton->setFont(font);
+        captureButton->raise();
         comboBox = new QComboBox(widget_2);
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setGeometry(QRect(30, 530, 81, 20));

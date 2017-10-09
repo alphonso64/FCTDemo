@@ -10,6 +10,7 @@ class PatternFile
 {
 public:
     PatternFile();
+    int th;
     QString path;
     QString name;
     void selfRelease();

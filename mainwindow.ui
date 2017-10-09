@@ -396,6 +396,8 @@ QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid 
                  <string>检测</string>
                 </property>
                </widget>
+               <zorder>captureButton</zorder>
+               <zorder>comboBox</zorder>
               </widget>
               <widget class="QComboBox" name="comboBox">
                <property name="geometry">

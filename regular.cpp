@@ -61,12 +61,14 @@ void Regular::update(QString path)
         PatternFile pattern;
         if(action.compare(MATCH_PROC) == 0){
             QString name = settings->value("temp").toString();
+            int th = settings->value("th").toInt();
             pattern.name = name;
             pattern.path = path;
+            pattern.th = th;
             QImage tempImg(path+"/"+name);
             Pic<uchar> pimg;
             pimg.createToGray(tempImg,4);
-            pattern.temps = make_temps(pimg);
+            pattern.temps = make_temps(pimg,th);
 //            for(int i=0;i<pattern.temps.size();i++){
 //                if(pattern.temps[i].data!=NULL)
 //                {
@@ -143,8 +145,9 @@ void Regular::savePatam2File(QString path)
             if(action.compare(MATCH_PROC)==0){
                 PatternFile pattern = tempsMap.value(iter.key());
                 QImage image(pattern.path+"/"+pattern.name);
-                qDebug()<<path+"/"+pattern.name<<image.width()<<pattern.path;
+                //qDebug()<<path+"/"+pattern.name<<image.width()<<pattern.path;
                 image.save(path+"/"+pattern.name);
+                settings->setValue("th",pattern.th);
                 settings->setValue("temp",  pattern.name);
             }
         }

@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     algorithm/m_size.cpp \
     util.cpp \
     regular.cpp \
-    patternfile.cpp
+    patternfile.cpp \
+    thsettingdialog.cpp
 
 HEADERS  += mainwindow.h \
     CusRect.h \
@@ -69,9 +70,11 @@ HEADERS  += mainwindow.h \
     const_define.h \
     util.h \
     regular.h \
-    patternfile.h
+    patternfile.h \
+    thsettingdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    thsettingdialog.ui
 
 LIBS+=D:/lib/x86/GxIAPI.lib
 LIBS+=D:/lib/x86/DxImageProc.lib

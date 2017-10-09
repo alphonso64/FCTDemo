@@ -16,7 +16,9 @@ void m_threshold(Pic<uchar> img ,Pic<uchar>& dst, uchar th);
 vector<Pic<uchar>> make_temps(Pic<uchar> temp);
 void release(vector<Pic<uchar>> temps);
 double mul_tempRoi(Pic<uchar> _img, vector<Pic<uchar>> temps, int MatchMethod);
+double mul_tempRoi(Pic<uchar> _img, vector<Pic<uchar>> temps, int MatchMethod,int th);
 vector<Pic<uchar>> make_temps(Pic<uchar> temp);
+vector<Pic<uchar>> make_temps(Pic<uchar> temp,int th);
 void m_resize(Pic<uchar> src, Pic<uchar> &dst, int cols, int rows);
 
 #endif

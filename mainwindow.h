@@ -13,6 +13,7 @@
 #include <QButtonGroup>
 #include <QLabel>
 #include <QPainter>
+#include "thsettingdialog.h"
 using namespace std;
 
 #pragma execution_character_set("utf-8")
@@ -50,6 +51,7 @@ private slots:
     void on_saveFileButton_clicked();
     void on_loadFileButton_clicked();
     void changeMode();
+    void dialogdone(int);
 
 private:
     void initNet();
@@ -72,6 +74,7 @@ private:
     QLabel *statusLabel;
     QLabel *statusLabel_;
     QPainter::CompositionMode mode;
+    ThSettingDialog dialog;
 public:
 
 };

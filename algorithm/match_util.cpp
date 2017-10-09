@@ -139,6 +139,26 @@ vector<Pic<uchar>> make_temps(Pic<uchar> temp){
 	return temps;
 }
 
+vector<Pic<uchar>> make_temps(Pic<uchar> temp,int th)
+{
+    vector<Pic<uchar>> temps;
+    Pic<uchar> img,scale_image,scale_angle_image;
+    m_threshold(temp, img, th);
+    double scale[3]={1.05,1,0.95};
+    double angle[3]={1,0,359};
+    for(int i=0;i<3;i++){
+        m_resize(img,scale_image,(int)(img.cols*scale[i]),(int)(img.rows*scale[i]));
+        for(int j=0;j<3;j++){
+            //scale_angle_image=rotateImage(scale_image,angle[j]);
+            m_rotate(scale_image,scale_angle_image,angle[j]);
+            temps.push_back(scale_angle_image);
+        }
+        scale_image.release();
+    }
+    img.release();
+    return temps;
+}
+
 void release(vector<Pic<uchar>> temps)
 {
 	for(int i=0;i<temps.size();i++){
@@ -256,4 +276,51 @@ double mul_tempRoi(Pic<uchar> _img, vector<Pic<uchar>> temps, int MatchMethod)
 		return *biggest; 
 	}
 	
+}
+
+double mul_tempRoi(Pic<uchar> _img, vector<Pic<uchar>> temps, int MatchMethod,int th)
+{
+        /***********************************************
+        【0】- 平方差匹配法(SQDIFF)
+        【1】- 归一化平方差匹配法(SQDIFF NORMED)
+        【2】- 相关匹配法(TM CCORR)\n
+        【3】- 归一化相关匹配法(TM CCORR NORMED)
+        【4】- 相关系数匹配法(TM COEFF)
+        【5】- 归一化相关系数匹配法(TM COEFF NORMED)
+        *************************************************/
+    //cvtColor(img,img,CV_RGB2GRAY);
+    Pic<uchar> img;
+    m_threshold(_img, img, th);
+    if((img.cols<temps[0].cols)|(img.rows<temps[0].rows)){
+
+        return -1;         //模板大于匹配区域
+    }
+    Pic<float> result;
+    vector<float> minValues,maxValues;
+    float minValue, maxValue;
+    m_point minLocation; m_point maxLocation;
+    /*  定义结果图的大小*/
+    for(int i=0;i<9;i++){
+        m_matchTemplate( img, temps[i], result, MatchMethod );      //匹配
+
+        //min_max( result, &minValue, &maxValue, &minLocation, &maxLocation, Mat() );
+        result.min_max(minValue,maxValue,minLocation,maxLocation);
+        minValues.push_back(minValue);
+        maxValues.push_back(maxValue);
+        result.release();
+    }
+    //根据匹配模式取值
+    if( MatchMethod  == TM_SQDIFF || MatchMethod == TM_SQDIFF_NORMED )
+    {
+        vector<float>::iterator smallest=min_element(minValues.begin(),minValues.end());
+        img.release();
+        return *smallest;
+    }
+    else
+    {
+        vector<float>::iterator biggest=max_element(maxValues.begin(),maxValues.end());
+        img.release();
+        return *biggest;
+    }
+
 }

@@ -7,12 +7,53 @@
 #include <algorithm/match_util.h>
 #include "util.h"
 #include "patternfile.h"
+#include "thsettingdialog.h"
+
+static void getRgbAndGray(QImage image,int depth,int &r,int &g,int &b,int &gray)
+{
+    uint tempR = 0;
+    uint tempG = 0;
+    uint tempB = 0;
+    uint cnt =0;
+    for (int ii = 0; ii < image.height(); ii++) {
+        uchar* scan = image.scanLine(ii);
+        for (int jj = 0; jj < image.width(); jj++) {
+            QRgb* rgbpixel = reinterpret_cast<QRgb*>(scan + jj*depth);
+            int red =qRed(*rgbpixel);
+            int green =qGreen(*rgbpixel);
+            int blue =qBlue(*rgbpixel);
+            if(red>60 || green>60 || blue>60)
+            {
+                tempR +=red;
+                tempB +=blue;
+                tempG +=green;
+                cnt++;
+            }
+        }
+    }
+
+    if(cnt > 20)
+    {
+        r =tempR / cnt;
+        b =tempB / cnt;
+        g =tempG / cnt;
+        gray = (r*299 + g*587 + b*114 + 500) / 1000;
+    }else{
+        r =0;
+        b =0;
+        g =0;
+        gray = 0;
+    }
+
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     this->setWindowTitle("FCTDEMO");
+    dialog.setWindowTitle("Threshold setting");
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
 
@@ -71,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->saveButton, SIGNAL(clicked()), this, SLOT(saveimg()));
     connect(&group,SIGNAL(buttonClicked(int)),this,SLOT(camSelect(int)));
     connect(ui->comboBox, SIGNAL(activated(int)), this, SLOT(changeMode()));
+    connect(&dialog, SIGNAL(finished(int)), this, SLOT(dialogdone(int)));
 
     cuscamera->start();
     statusBar()->addWidget( statusLabel = new QLabel("正在打开摄像机 "));
@@ -109,6 +151,34 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mode = QPainter::CompositionMode_Difference;
 
+}
+
+void MainWindow::dialogdone(int value)
+{
+    QFileInfo fileInfo(dialog.filePath);
+    int row = ui->tableWidget->currentRow();
+    QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+fileInfo.fileName()+")"+"("+QString::number(value)+")");
+    item->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->setItem(row, 1, item);
+    PatternFile pattern;
+    pattern.name = fileInfo.fileName();
+    pattern.path = fileInfo.path();
+    pattern.th = value;
+    QImage tempImg(fileInfo.filePath());
+    Pic<uchar> pimg;
+    pimg.createToGray(tempImg,4);
+    pattern.temps = make_temps(pimg,pattern.th);
+    pimg.release();
+
+//    for(int i=0;i<pattern.temps.size();i++){
+//        if(pattern.temps[i].data!=NULL)
+//        {
+//            qDebug()<<"pattern.temps"<<pattern.temps[i].data;
+//        }
+//    }
+
+    ui->label_2->getRegular()->setActionMapContent(dialog.key,MATCH_PROC);
+    ui->label_2->getRegular()->setTempsMapContent(dialog.key,pattern);
 }
 
 void MainWindow::changeMode()
@@ -304,7 +374,8 @@ void  MainWindow::CusRectListChanged(QMap<int, CusRect> map,QMap<int, QString> a
         if(action.compare(MATCH_PROC)==0)
         {
             QString temp = ui->label_2->getRegular()->tempsMap.value(iter.key()).name;
-            QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+temp+")");
+            int th = ui->label_2->getRegular()->tempsMap.value(iter.key()).th;
+            QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+temp+")"+"("+QString::number(th)+")");
             item->setTextAlignment(Qt::AlignCenter);
             ui->tableWidget->setItem(cnt++, 1, item);
         }
@@ -378,32 +449,10 @@ void MainWindow::MatchClick()
         if(path.length() == 0) {
             return;
         }else{
-            QFileInfo fileInfo(path);
-
-
-            QTableWidgetItem *item  = new QTableWidgetItem(MATCH_PROC_TEXT+"("+fileInfo.fileName()+")");
-            item->setTextAlignment(Qt::AlignCenter);
-            ui->tableWidget->setItem(row, 1, item);
-
-            PatternFile pattern;
-            pattern.name = fileInfo.fileName();
-            pattern.path = fileInfo.path();
-            QImage tempImg(fileInfo.filePath());
-            Pic<uchar> pimg;
-            pimg.createToGray(tempImg,4);
-            pattern.temps = make_temps(pimg);
-            pimg.release();
-
-            for(int i=0;i<pattern.temps.size();i++){
-                if(pattern.temps[i].data!=NULL)
-                {
-                    qDebug()<<"pattern.temps"<<pattern.temps[i].data;
-                }
-            }
-
             int key = ui->tableWidget->item(row,0)->text().toInt();
-            ui->label_2->getRegular()->setActionMapContent(key,MATCH_PROC);
-            ui->label_2->getRegular()->setTempsMapContent(key,pattern);
+            dialog.filePath = path;
+            dialog.key = key;
+            dialog.show();
 
         }
     }
@@ -443,12 +492,17 @@ void MainWindow::detectClick()
             QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
             item->setTextAlignment(Qt::AlignCenter);
             Pic<uchar> pimg;
+            int r,g,b,gray;
             if(capID == CAM_CAP){
+                getRgbAndGray(temp,3,r,g,b,gray);
                 pimg.createToGray(temp,3);
             }else if(capID == PIC_CAP){
+                getRgbAndGray(temp,4,r,g,b,gray);
                 pimg.createToGray(temp,4);
             }
-            double res = mul_tempRoi(pimg,ui->label_2->getRegular()->tempsMap.value(iter.key()).temps,1);
+            PatternFile pa = ui->label_2->getRegular()->tempsMap.value(iter.key());
+
+            double res = mul_tempRoi(pimg,pa.temps,1,pa.th);
             if(res <-0.1f)
             {
                 item  = new QTableWidgetItem("error");
@@ -464,9 +518,12 @@ void MainWindow::detectClick()
             QTableWidgetItem *item  = new QTableWidgetItem(QString::number(iter.key()));
             item->setTextAlignment(Qt::AlignCenter);
             Pic<uchar> pimg;
+            int r,g,b,gray;
             if(capID == CAM_CAP){
+                getRgbAndGray(temp,3,r,g,b,gray);
                 pimg.createToGray(temp,3);
             }else if(capID == PIC_CAP){
+                getRgbAndGray(temp,4,r,g,b,gray);
                 pimg.createToGray(temp,4);
             }
             int predict = cnn->test_Pic(pimg);
@@ -506,10 +563,10 @@ void MainWindow::proecssBlock(int n )
     {
         QRect rec = cusrec.getRect(image.width(), image.height());
         srcImage = image.copy(rec);
-        qDebug()<<"cusrec into";
+        //qDebug()<<"cusrec into";
     }else{
         srcImage = image;
-        qDebug()<<"cusrec no into";
+        //qDebug()<<"cusrec no into";
     }
 
     while(viter.hasNext())
@@ -523,16 +580,20 @@ void MainWindow::proecssBlock(int n )
             QRect rec = rect.getRect(image.width(), image.height());
             QImage temp = image.copy(rec);
             QString action = ui->label_2->getRegular()->actionMap.value(blockid);
-
+            int r,g,b,gray;
             if(action.compare(MATCH_PROC) == 0)
             {
                 Pic<uchar> pimg;
                 if(capID == CAM_CAP){
+                    getRgbAndGray(temp,3,r,g,b,gray);
                     pimg.createToGray(temp,3);
                 }else if(capID == PIC_CAP){
+                    getRgbAndGray(temp,4,r,g,b,gray);
                     pimg.createToGray(temp,4);
                 }
-                double res = mul_tempRoi(pimg,ui->label_2->getRegular()->tempsMap.value(blockid).temps,1);
+                PatternFile pa = ui->label_2->getRegular()->tempsMap.value(blockid);
+
+                double res = mul_tempRoi(pimg,pa.temps,1,pa.th);
                 if(res > 0.5f)
                 {
                     custdata.replybuffer.state = 0;
@@ -545,23 +606,34 @@ void MainWindow::proecssBlock(int n )
                 {
                     custdata.replybuffer.state = 0xff;
                 }
-                custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f);
+                custdata.replybuffer.r = r;
+                custdata.replybuffer.g = g;
+                custdata.replybuffer.b = b;
+                custdata.replybuffer.grayscale = gray;
+                custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f); 
                 pimg.release();
 
             }
             else if(action.compare(RECOG_PROC) == 0)
             {
                 Pic<uchar> pimg;
+
                 if(capID == CAM_CAP){
+                    getRgbAndGray(temp,3,r,g,b,gray);
                     pimg.createToGray(temp,3);
                 }else if(capID == PIC_CAP){
+                    getRgbAndGray(temp,4,r,g,b,gray);
                     pimg.createToGray(temp,4);
                 }
                 int predict = cnn->test_Pic(pimg);
-                qDebug()<<"predict"<<predict;
+                //qDebug()<<"predict"<<predict;
                 custdata.replybuffer.number = predict;
                 pimg.release();
             }
+            custdata.replybuffer.r = r;
+            custdata.replybuffer.g = g;
+            custdata.replybuffer.b = b;
+            custdata.replybuffer.grayscale = gray;
             custdata.replybuffer.similarity = custdata.replybuffer.similarity % 101;
             custdata.replybuffer.id = blockid;
             custdata.replybuffer.width  = temp.width();
@@ -596,8 +668,9 @@ void MainWindow::loadPatternFile(int code)
     QSettings *configIniRead = new QSettings(PATTERN_FILE_PATH, QSettings::IniFormat);
     QString key("/config/");
     key.append(QString::number(code));
-    qDebug()<<key;
+    qDebug()<<PATTERN_FILE_PATH<<key;
     QString path = configIniRead->value(key).toString();
+    qDebug()<<path;
     if(path.length() != 0)
     {
         val = 1;
@@ -707,3 +780,5 @@ void MainWindow::on_loadFileButton_clicked()
         updateStatusBar();
     }
 }
+
+
