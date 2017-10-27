@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "imageproc.h"
 #include "const_define.h"
 #include "tcprwworker.h"
 #include <vector>
@@ -14,6 +13,8 @@
 #include <QLabel>
 #include <QPainter>
 #include "thsettingdialog.h"
+#include <dhcamera.h>
+#include "usbkeychecker.h"
 using namespace std;
 
 #pragma execution_character_set("utf-8")
@@ -39,7 +40,8 @@ private slots:
     void RecogClick();
     void detectClick();
     void ItemActivated( int row,int col);
-    void proecssBlock(int n);
+    void proecssBlock_cam1(int n);
+    void proecssBlock_cam2(int n);
     void capimg();
     void saveimg();
     void camInitRdy(int);
@@ -52,7 +54,7 @@ private slots:
     void on_loadFileButton_clicked();
     void changeMode();
     void dialogdone(int);
-
+    void usbkeyCheck();
 private:
     void initNet();
     void send2Client();
@@ -60,6 +62,8 @@ private:
     void updateStatusBar(int state);
     void updateStatusBar();
     void addOp(QPainter::CompositionMode mode, const QString &name);
+    bool nativeEvent(const QByteArray & eventType, void * message, long *result);
+    void usbDetectInit();
 
     Ui::MainWindow *ui;
     int capID;
@@ -70,11 +74,15 @@ private:
     TCPRWWorker * tcpworker;
     QVector<CusReplyData> vect;
     CusCamera *cuscamera;
+    DHCamera *dhcamera;
     QImage image;
     QLabel *statusLabel;
     QLabel *statusLabel_;
+    QLabel *statusLabel_key;
     QPainter::CompositionMode mode;
     ThSettingDialog dialog;
+    USBKEYChecker usbkeyChecker;
+    QTimer *keyTimer;
 public:
 
 };

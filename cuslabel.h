@@ -20,8 +20,9 @@ public:
     void disableRect();
     void enableTransRect();
     void disableTransRect();
-    Regular* getRegular();
-
+    Regular* getRegular(); 
+    Regular* getRegular(int index);
+    void changeRegular(int index);
 signals:
     void ListChanged(QMap<int, CusRect> recMap,QMap<int, QString> actionMap);
 
@@ -32,6 +33,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 
 private:
+    Regular *regular_list[2];
     Regular *regular;
     bool startflag;
     bool drawflag;

@@ -29,11 +29,13 @@ public:
     volatile int isthreadstopped;
     volatile int doprocessimage;
     volatile int isnewrequest;
-    QVector<int>  blockidlist;
+    QVector<int>  blockidlist_cam1;
+    QVector<int>  blockidlist_cam2;
 private:
     void processCmd(QByteArray * array);
 signals:
-    void processImg(int id);
+    void processImg_cam1(int id);
+    void processImg_cam2(int id);
     void loadPatternFile(int code);
     void selectImageSrc(int code);
     void changeImage(int code);

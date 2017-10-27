@@ -9,6 +9,7 @@ public:
     static void imageFormat(QImage *image,QColor color);
     static void bmpconvertToRGBA(QImage image,uint *dst);
     static void camconvertToRGBA(QImage image,uint *dst);
+    static int  checkUSBKEY();
 };
 
 #endif // UTIL_H

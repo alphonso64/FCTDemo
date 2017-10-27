@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.2.0, 2017-10-07T14:16:38. -->
+<!-- Written by QtCreator 4.0.2, 2017-10-26T15:21:16. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -59,14 +59,14 @@
  <data>
   <variable>ProjectExplorer.Project.Target.0</variable>
   <valuemap type="QVariantMap">
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 5.7.1 MSVC2013 32bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 5.7.1 MSVC2013 32bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.57.win32_msvc2013_kit</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Qt 5.7.1 (msvc2013)</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Qt 5.7.1 (msvc2013)</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">{ea35a838-b712-4d85-9566-e5406580462e}</value>
    <value type="int" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="int" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:/Users/alphonso/FCTDemo</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory"></value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>

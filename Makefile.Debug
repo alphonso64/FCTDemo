@@ -11,19 +11,19 @@ MAKEFILE      = Makefile.Debug
 
 CC            = cl
 CXX           = cl
-DEFINES       = -DUNICODE -DWIN32 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
+DEFINES       = -DUNICODE -DWIN32 -DQT_NO_WARNING_OUTPUT -DQT_NO_DEBUG_OUTPUT -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
 CFLAGS        = -nologo -Zc:wchar_t -FS -Zi -MDd -W3 /Fddebug\Distill.vc.pdb $(DEFINES)
 CXXFLAGS      = -nologo -Zc:wchar_t -FS -Zi -MDd -GR -W3 -w34100 -w34189 -w44996 -EHsc /Fddebug\Distill.vc.pdb $(DEFINES)
 INCPATH       = -I. -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtANGLE -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore -Idebug -I. -I..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\win32-msvc2013 
 LINKER        = link
 LFLAGS        = /NOLOGO /DYNAMICBASE /NXCOMPAT /DEBUG /SUBSYSTEM:WINDOWS,5.01 "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'"
-LIBS          = /LIBPATH:C:\Qt\Qt5.7.1\5.7\msvc2013\lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\qtmaind.lib shell32.lib /LIBPATH:C:\utils\my_sql\my_sql\lib /LIBPATH:C:\utils\postgresql\pgsql\lib D:\lib\x86\GxIAPI.lib D:\lib\x86\DxImageProc.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Widgetsd.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Guid.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Networkd.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Cored.lib 
+LIBS          = /LIBPATH:C:\Qt\Qt5.7.1\5.7\msvc2013\lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\qtmaind.lib shell32.lib /LIBPATH:C:\utils\my_sql\my_sql\lib /LIBPATH:C:\utils\postgresql\pgsql\lib D:\lib\x86\GxIAPI.lib D:\lib\x86\DxImageProc.lib D:\lib\x86\hasp_windows_demo.lib user32.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Widgetsd.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Guid.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Networkd.lib C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Cored.lib debug\Distill_resource.res 
 QMAKE         = C:\Qt\Qt5.7.1\5.7\msvc2013\bin\qmake.exe
 IDC           = idc
 IDL           = midl
 ZIP           = zip -r -9
 DEF_FILE      = 
-RES_FILE      = 
+RES_FILE      = debug\Distill_resource.res
 COPY          = copy /y
 SED           = $(QMAKE) -install sed
 COPY_FILE     = copy /y
@@ -46,7 +46,6 @@ OBJECTS_DIR   = debug
 SOURCES       = main.cpp \
 		mainwindow.cpp \
 		CusRect.cpp \
-		imageproc.cpp \
 		paintlabel.cpp \
 		tcprwworker.cpp \
 		cuscamera.cpp \
@@ -67,16 +66,18 @@ SOURCES       = main.cpp \
 		util.cpp \
 		regular.cpp \
 		patternfile.cpp \
-		thsettingdialog.cpp debug\moc_mainwindow.cpp \
+		thsettingdialog.cpp \
+		dhcamera.cpp \
+		usbkeychecker.cpp debug\moc_mainwindow.cpp \
 		debug\moc_paintlabel.cpp \
 		debug\moc_tcprwworker.cpp \
 		debug\moc_cuscamera.cpp \
 		debug\moc_cuslabel.cpp \
-		debug\moc_thsettingdialog.cpp
+		debug\moc_thsettingdialog.cpp \
+		debug\moc_dhcamera.cpp
 OBJECTS       = debug\main.obj \
 		debug\mainwindow.obj \
 		debug\CusRect.obj \
-		debug\imageproc.obj \
 		debug\paintlabel.obj \
 		debug\tcprwworker.obj \
 		debug\cuscamera.obj \
@@ -98,16 +99,18 @@ OBJECTS       = debug\main.obj \
 		debug\regular.obj \
 		debug\patternfile.obj \
 		debug\thsettingdialog.obj \
+		debug\dhcamera.obj \
+		debug\usbkeychecker.obj \
 		debug\moc_mainwindow.obj \
 		debug\moc_paintlabel.obj \
 		debug\moc_tcprwworker.obj \
 		debug\moc_cuscamera.obj \
 		debug\moc_cuslabel.obj \
-		debug\moc_thsettingdialog.obj
+		debug\moc_thsettingdialog.obj \
+		debug\moc_dhcamera.obj
 
 DIST          =  mainwindow.h \
 		CusRect.h \
-		imageproc.h \
 		paintlabel.h \
 		tcprwworker.h \
 		DxImageProc.h \
@@ -135,10 +138,13 @@ DIST          =  mainwindow.h \
 		util.h \
 		regular.h \
 		patternfile.h \
-		thsettingdialog.h main.cpp \
+		thsettingdialog.h \
+		dhcamera.h \
+		imageproc.h \
+		usbkeychecker.h \
+		hasp_api.h main.cpp \
 		mainwindow.cpp \
 		CusRect.cpp \
-		imageproc.cpp \
 		paintlabel.cpp \
 		tcprwworker.cpp \
 		cuscamera.cpp \
@@ -159,7 +165,9 @@ DIST          =  mainwindow.h \
 		util.cpp \
 		regular.cpp \
 		patternfile.cpp \
-		thsettingdialog.cpp
+		thsettingdialog.cpp \
+		dhcamera.cpp \
+		usbkeychecker.cpp
 QMAKE_TARGET  = Distill
 DESTDIR        = debug\ #avoid trailing-slash linebreak
 TARGET         = Distill.exe
@@ -234,10 +242,13 @@ DESTDIR_TARGET = debug\Distill.exe
 first: all
 all: Makefile.Debug  $(DESTDIR_TARGET)
 
-$(DESTDIR_TARGET): ui_mainwindow.h ui_thsettingdialog.h $(OBJECTS) 
+$(DESTDIR_TARGET): ui_mainwindow.h ui_thsettingdialog.h $(OBJECTS) debug\Distill_resource.res
 	$(LINKER) $(LFLAGS) /MANIFEST:embed /OUT:$(DESTDIR_TARGET) @<<
 $(OBJECTS) $(LIBS)
 <<
+
+debug\Distill_resource.res: Distill_resource.rc
+	rc -D_DEBUG $(DEFINES) -fo debug\Distill_resource.res Distill_resource.rc
 
 qmake: FORCE
 	@$(QMAKE) -spec win32-msvc2013 -o Makefile.Debug Distill.pro
@@ -248,8 +259,9 @@ dist:
 	$(ZIP) Distill.zip $(SOURCES) $(DIST) Distill.pro ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\spec_pre.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\common\angle.conf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\common\msvc-base.conf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\common\msvc-desktop.conf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\qconfig.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dcore.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dcore_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dextras.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dextras_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dinput.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dinput_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dlogic.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dlogic_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquick.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquick_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickextras.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickextras_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickinput.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickinput_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickrender.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickrender_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3drender.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3drender_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axbase.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axbase_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axcontainer.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axcontainer_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axserver.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axserver_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_bluetooth.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_bluetooth_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_bootstrap_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_clucene_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_concurrent.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_concurrent_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_core.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_core_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_dbus.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_dbus_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_designer.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_designer_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_designercomponents_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gamepad.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gamepad_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gui.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gui_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_help.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_help_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_location.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_location_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimedia.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimedia_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimediawidgets.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimediawidgets_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_network.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_network_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_nfc.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_nfc_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_opengl.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_opengl_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_openglextensions.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_openglextensions_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_packetprotocol_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_platformsupport_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_positioning.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_positioning_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_printsupport.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_printsupport_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_purchasing.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_purchasing_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qml.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qml_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmldebug_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmldevtools_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmltest.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmltest_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quick.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quick_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickcontrols2.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickcontrols2_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickparticles_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quicktemplates2_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickwidgets.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickwidgets_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_script.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_script_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scripttools.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scripttools_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scxml.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scxml_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sensors.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sensors_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialbus.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialbus_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialport.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialport_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sql.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sql_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_svg.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_svg_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_testlib.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_testlib_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_uiplugin.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_uitools.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_uitools_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webchannel.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webchannel_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webengine.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webengine_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginecore.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginecore_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginecoreheaders_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginewidgets.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginewidgets_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_websockets.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_websockets_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webview.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webview_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_widgets.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_widgets_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_winextras.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_winextras_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xml.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xml_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xmlpatterns.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xmlpatterns_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_zlib_private.pri ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qt_functions.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qt_config.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\qt_config.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\win32-msvc2013\qmake.conf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\spec_post.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\exclusive_builds.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\toolchain.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\default_pre.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\default_pre.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\resolve_config.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\exclusive_builds_post.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\default_post.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\build_pass.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\rtti.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\precompile_header.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\warn_on.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qt.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\resources.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\moc.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\opengl.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\uic.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\file_copies.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\windows.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\testcase_targets.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\exceptions.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\yacc.prf ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\lex.prf Distill.pro ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\lib\qtmaind.prl ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Widgetsd.prl ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Guid.prl ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Networkd.prl ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Cored.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) debug\main.obj debug\mainwindow.obj debug\CusRect.obj debug\imageproc.obj debug\paintlabel.obj debug\tcprwworker.obj debug\cuscamera.obj debug\cuslabel.obj debug\m_meanStdDev.obj debug\pic.obj debug\m_crossCorr.obj debug\match_util.obj debug\m_mulspectrums.obj debug\m_interal.obj debug\CNN.obj debug\Layer.obj debug\CNN_util.obj debug\m_matchtemp.obj debug\m_dft.obj debug\m_point.obj debug\m_size.obj debug\util.obj debug\regular.obj debug\patternfile.obj debug\thsettingdialog.obj debug\moc_mainwindow.obj debug\moc_paintlabel.obj debug\moc_tcprwworker.obj debug\moc_cuscamera.obj debug\moc_cuslabel.obj debug\moc_thsettingdialog.obj
+	-$(DEL_FILE) debug\main.obj debug\mainwindow.obj debug\CusRect.obj debug\paintlabel.obj debug\tcprwworker.obj debug\cuscamera.obj debug\cuslabel.obj debug\m_meanStdDev.obj debug\pic.obj debug\m_crossCorr.obj debug\match_util.obj debug\m_mulspectrums.obj debug\m_interal.obj debug\CNN.obj debug\Layer.obj debug\CNN_util.obj debug\m_matchtemp.obj debug\m_dft.obj debug\m_point.obj debug\m_size.obj debug\util.obj debug\regular.obj debug\patternfile.obj debug\thsettingdialog.obj debug\dhcamera.obj debug\usbkeychecker.obj debug\moc_mainwindow.obj debug\moc_paintlabel.obj debug\moc_tcprwworker.obj debug\moc_cuscamera.obj debug\moc_cuslabel.obj debug\moc_thsettingdialog.obj debug\moc_dhcamera.obj
 	-$(DEL_FILE) debug\Distill.exp debug\Distill.vc.pdb debug\Distill.ilk debug\Distill.idb
+	-$(DEL_FILE) debug\Distill_resource.res
 
 distclean: clean 
 	-$(DEL_FILE) debug\Distill.lib debug\Distill.pdb
@@ -268,9 +280,9 @@ compiler_no_pch_compiler_make_all:
 compiler_no_pch_compiler_clean:
 compiler_rcc_make_all:
 compiler_rcc_clean:
-compiler_moc_header_make_all: debug\moc_mainwindow.cpp debug\moc_paintlabel.cpp debug\moc_tcprwworker.cpp debug\moc_cuscamera.cpp debug\moc_cuslabel.cpp debug\moc_thsettingdialog.cpp
+compiler_moc_header_make_all: debug\moc_mainwindow.cpp debug\moc_paintlabel.cpp debug\moc_tcprwworker.cpp debug\moc_cuscamera.cpp debug\moc_cuslabel.cpp debug\moc_thsettingdialog.cpp debug\moc_dhcamera.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) debug\moc_mainwindow.cpp debug\moc_paintlabel.cpp debug\moc_tcprwworker.cpp debug\moc_cuscamera.cpp debug\moc_cuslabel.cpp debug\moc_thsettingdialog.cpp
+	-$(DEL_FILE) debug\moc_mainwindow.cpp debug\moc_paintlabel.cpp debug\moc_tcprwworker.cpp debug\moc_cuscamera.cpp debug\moc_cuslabel.cpp debug\moc_thsettingdialog.cpp debug\moc_dhcamera.cpp
 debug\moc_mainwindow.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QMainWindow \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qmainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qwidget.h \
@@ -371,16 +383,11 @@ debug\moc_mainwindow.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QMa
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtouchdevice.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qtabwidget.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qicon.h \
-		imageproc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
-		DxImageProc.h \
-		GxIAPI.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		const_define.h \
 		tcprwworker.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\QtNetwork \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\QtNetworkDepends \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QtCore \
@@ -495,6 +502,7 @@ debug\moc_mainwindow.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QMa
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qabstractnetworkcache.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qnetworkrequest.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSharedDataPointer \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QUrl \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qhttpmultipart.h \
@@ -542,6 +550,10 @@ debug\moc_mainwindow.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QMa
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qtnetworkversion.h \
 		cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
+		dhcamera.h \
+		DxImageProc.h \
+		GxIAPI.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		algorithm\CNN.h \
 		algorithm\CNN_util.h \
 		algorithm\Layer.h \
@@ -563,6 +575,7 @@ debug\moc_mainwindow.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QMa
 		thsettingdialog.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QDialog \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qdialog.h \
+		usbkeychecker.h \
 		mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe
 	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe $(DEFINES) -D_MSC_VER=1800 -D_WIN32 -IC:/Qt/Qt5.7.1/5.7/msvc2013/mkspecs/win32-msvc2013 -IC:/Users/alphonso/FCTDemo -IC:/Qt/Qt5.7.1/5.7/msvc2013/include -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtWidgets -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtGui -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtANGLE -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtNetwork -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtCore mainwindow.h -o debug\moc_mainwindow.cpp
@@ -910,10 +923,11 @@ debug\moc_tcprwworker.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThre
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe
 	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe $(DEFINES) -D_MSC_VER=1800 -D_WIN32 -IC:/Qt/Qt5.7.1/5.7/msvc2013/mkspecs/win32-msvc2013 -IC:/Users/alphonso/FCTDemo -IC:/Qt/Qt5.7.1/5.7/msvc2013/include -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtWidgets -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtGui -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtANGLE -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtNetwork -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtCore tcprwworker.h -o debug\moc_tcprwworker.cpp
 
-debug\moc_cuscamera.cpp: imageproc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+debug\moc_cuscamera.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
@@ -936,11 +950,33 @@ debug\moc_cuscamera.cpp: imageproc.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtimer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasictimer.h \
+		dhcamera.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QObject \
 		DxImageProc.h \
 		GxIAPI.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
@@ -948,20 +984,9 @@ debug\moc_cuscamera.cpp: imageproc.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qimage.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qcolor.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgb.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgba64.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpaintdevice.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs_win.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrect.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmargins.h \
@@ -974,21 +999,9 @@ debug\moc_cuscamera.cpp: imageproc.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvector.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qregion.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatastream.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtimer.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasictimer.h \
 		cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe
 	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe $(DEFINES) -D_MSC_VER=1800 -D_WIN32 -IC:/Qt/Qt5.7.1/5.7/msvc2013/mkspecs/win32-msvc2013 -IC:/Users/alphonso/FCTDemo -IC:/Qt/Qt5.7.1/5.7/msvc2013/include -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtWidgets -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtGui -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtANGLE -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtNetwork -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtCore cuscamera.h -o debug\moc_cuscamera.cpp
@@ -1219,6 +1232,83 @@ debug\moc_thsettingdialog.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidget
 		thsettingdialog.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe
 	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe $(DEFINES) -D_MSC_VER=1800 -D_WIN32 -IC:/Qt/Qt5.7.1/5.7/msvc2013/mkspecs/win32-msvc2013 -IC:/Users/alphonso/FCTDemo -IC:/Qt/Qt5.7.1/5.7/msvc2013/include -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtWidgets -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtGui -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtANGLE -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtNetwork -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtCore thsettingdialog.h -o debug\moc_thsettingdialog.cpp
+
+debug\moc_dhcamera.cpp: ..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QObject \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsystemdetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qprocessordetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcompilerdetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypeinfo.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypetraits.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qisenum.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsysinfo.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlogging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qflags.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasicatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_bootstrap.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qgenericatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_cxx11.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_msvc.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobalstatic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
+		DxImageProc.h \
+		GxIAPI.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qimage.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qcolor.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgb.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgba64.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpaintdevice.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs_win.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrect.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmargins.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsize.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpoint.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpixelformat.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtransform.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qmatrix.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpolygon.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvector.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qregion.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatastream.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
+		dhcamera.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe
+	C:\Qt\Qt5.7.1\5.7\msvc2013\bin\moc.exe $(DEFINES) -D_MSC_VER=1800 -D_WIN32 -IC:/Qt/Qt5.7.1/5.7/msvc2013/mkspecs/win32-msvc2013 -IC:/Users/alphonso/FCTDemo -IC:/Qt/Qt5.7.1/5.7/msvc2013/include -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtWidgets -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtGui -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtANGLE -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtNetwork -IC:/Qt/Qt5.7.1/5.7/msvc2013/include/QtCore dhcamera.h -o debug\moc_dhcamera.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -1571,16 +1661,11 @@ debug\main.obj: main.cpp mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtouchdevice.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qtabwidget.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qicon.h \
-		imageproc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
-		DxImageProc.h \
-		GxIAPI.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		const_define.h \
 		tcprwworker.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\QtNetwork \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\QtNetworkDepends \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QtCore \
@@ -1695,6 +1780,7 @@ debug\main.obj: main.cpp mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qabstractnetworkcache.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qnetworkrequest.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSharedDataPointer \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QUrl \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qhttpmultipart.h \
@@ -1742,6 +1828,10 @@ debug\main.obj: main.cpp mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qtnetworkversion.h \
 		cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
+		dhcamera.h \
+		DxImageProc.h \
+		GxIAPI.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		algorithm/CNN.h \
 		algorithm/CNN_util.h \
 		algorithm/Layer.h \
@@ -1763,6 +1853,7 @@ debug\main.obj: main.cpp mainwindow.h \
 		thsettingdialog.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QDialog \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qdialog.h \
+		usbkeychecker.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QApplication \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qapplication.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qdesktopwidget.h \
@@ -1870,16 +1961,11 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtouchdevice.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qtabwidget.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qicon.h \
-		imageproc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
-		DxImageProc.h \
-		GxIAPI.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		const_define.h \
 		tcprwworker.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\QtNetwork \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\QtNetworkDepends \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QtCore \
@@ -1994,6 +2080,7 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qabstractnetworkcache.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qnetworkrequest.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QSharedDataPointer \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QUrl \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qhttpmultipart.h \
@@ -2041,6 +2128,10 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtNetwork\qtnetworkversion.h \
 		cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
+		dhcamera.h \
+		DxImageProc.h \
+		GxIAPI.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
 		algorithm/CNN.h \
 		algorithm/CNN_util.h \
 		algorithm/Layer.h \
@@ -2062,6 +2153,7 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		thsettingdialog.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QDialog \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qdialog.h \
+		usbkeychecker.h \
 		ui_mainwindow.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QAction \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qaction.h \
@@ -2128,6 +2220,7 @@ debug\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		algorithm/m_mulspectrums.h \
 		algorithm/m_interal.h \
 		algorithm/m_meanStdDev.h \
+		imageproc.h \
 		util.h
 
 debug\CusRect.obj: CusRect.cpp CusRect.h \
@@ -2159,94 +2252,6 @@ debug\CusRect.obj: CusRect.cpp CusRect.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsize.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpoint.h
-
-debug\imageproc.obj: imageproc.cpp imageproc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsystemdetection.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qprocessordetection.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcompilerdetection.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypeinfo.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypetraits.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qisenum.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsysinfo.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlogging.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qflags.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasicatomic.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_bootstrap.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qgenericatomic.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_cxx11.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_msvc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobalstatic.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
-		DxImageProc.h \
-		GxIAPI.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qimage.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qcolor.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgb.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgba64.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpaintdevice.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs_win.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrect.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmargins.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsize.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpoint.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpixelformat.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtransform.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qmatrix.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpolygon.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvector.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qregion.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatastream.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QDebug \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdebug.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhash.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmap.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtextstream.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlocale.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvariant.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qshareddata.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qset.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontiguouscache.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer_impl.h \
-		const_define.h
 
 debug\paintlabel.obj: paintlabel.cpp paintlabel.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QLabel \
@@ -2594,10 +2599,11 @@ debug\tcprwworker.obj: tcprwworker.cpp tcprwworker.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QDebug
 
 debug\cuscamera.obj: cuscamera.cpp cuscamera.h \
-		imageproc.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
@@ -2620,11 +2626,33 @@ debug\cuscamera.obj: cuscamera.cpp cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtimer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasictimer.h \
+		dhcamera.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QObject \
 		DxImageProc.h \
 		GxIAPI.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
@@ -2632,20 +2660,9 @@ debug\cuscamera.obj: cuscamera.cpp cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qimage.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qcolor.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgb.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgba64.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpaintdevice.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs_win.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrect.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmargins.h \
@@ -2658,21 +2675,9 @@ debug\cuscamera.obj: cuscamera.cpp cuscamera.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvector.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qregion.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatastream.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qthread.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTimer \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtimer.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasictimer.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QDebug \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdebug.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhash.h \
@@ -3628,7 +3633,8 @@ debug\util.obj: util.cpp util.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qset.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontiguouscache.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer_impl.h
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer_impl.h \
+		hasp_api.h
 
 debug\regular.obj: regular.cpp regular.h \
 		CusRect.h \
@@ -3726,9 +3732,6 @@ debug\regular.obj: regular.cpp regular.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsettings.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qDebug.h \
 		imageproc.h \
-		DxImageProc.h \
-		GxIAPI.h \
-		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
 		algorithm/match_util.h \
 		algorithm/m_matchtemp.h \
 		algorithm/m_crossCorr.h \
@@ -3981,6 +3984,167 @@ debug\thsettingdialog.obj: thsettingdialog.cpp thsettingdialog.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qabstractbutton.h \
 		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QSlider
 
+debug\dhcamera.obj: dhcamera.cpp dhcamera.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QObject \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsystemdetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qprocessordetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcompilerdetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypeinfo.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypetraits.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qisenum.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsysinfo.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlogging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qflags.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasicatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_bootstrap.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qgenericatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_cxx11.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_msvc.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobalstatic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
+		DxImageProc.h \
+		GxIAPI.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QMutex \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qimage.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qcolor.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgb.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgba64.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpaintdevice.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs_win.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrect.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmargins.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsize.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpoint.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpixelformat.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtransform.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qmatrix.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpolygon.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvector.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qregion.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatastream.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QDebug \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdebug.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhash.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmap.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtextstream.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlocale.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvariant.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qshareddata.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qset.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontiguouscache.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsharedpointer_impl.h \
+		const_define.h
+
+debug\usbkeychecker.obj: usbkeychecker.cpp usbkeychecker.h \
+		util.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QImage \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qimage.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qcolor.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgb.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsystemdetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qprocessordetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcompilerdetection.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypeinfo.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypetraits.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qisenum.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsysinfo.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlogging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qflags.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasicatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_bootstrap.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qgenericatomic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_cxx11.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_msvc.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobalstatic.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qrgba64.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpaintdevice.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qwindowdefs_win.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrect.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmargins.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsize.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpoint.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpixelformat.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtransform.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qmatrix.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpolygon.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvector.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qregion.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatastream.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qscopedpointer.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcoreevent.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmetatype.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qvarlengtharray.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcontainerfwd.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject_impl.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qline.h \
+		..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qpainterpath.h \
+		const_define.h
+
 debug\moc_mainwindow.obj: debug\moc_mainwindow.cpp 
 
 debug\moc_paintlabel.obj: debug\moc_paintlabel.cpp 
@@ -3992,6 +4156,8 @@ debug\moc_cuscamera.obj: debug\moc_cuscamera.cpp
 debug\moc_cuslabel.obj: debug\moc_cuslabel.cpp 
 
 debug\moc_thsettingdialog.obj: debug\moc_thsettingdialog.cpp 
+
+debug\moc_dhcamera.obj: debug\moc_dhcamera.cpp 
 
 ####### Install
 

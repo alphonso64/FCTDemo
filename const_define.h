@@ -4,11 +4,15 @@
 //#define LAYER_1_KERNEL "D:\\test1\\"
 
 #define CAM_CAP 100
+#define CAM2_CAP 1000
 #define PIC_CAP 101
 #define CALI_CAP 102
 
 #define SUCCESS 0
 #define FAIL -1
+
+#define USBCHECK
+#define USB_CHECK_MAX_CNT 3
 
 //#define LOCALTEST
 
@@ -31,5 +35,6 @@
 #define TEMPSPATH "./temps"
 #define PATTERN_FILE_PATH "./bin/code.ini"
 #endif
+
 
 #endif // CONST_DEFINE_H

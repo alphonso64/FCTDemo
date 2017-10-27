@@ -18,13 +18,13 @@ void  TCPRWWorker::processConnection()
 
 void  TCPRWWorker::sendCmd(char * buf, int len)
 {
-    qDebug()<<"sned msg";
+
     readWriteSocket->write(buf, len);
 }
 
 void  TCPRWWorker::processText()
 {
-    qDebug() << "processText";
+    //qDebug() << "processText";
     QByteArray bytearray;
     bytearray = readWriteSocket->readAll();
     processCmd(&bytearray);
@@ -36,23 +36,39 @@ void TCPRWWorker::processCmd(QByteArray * array)
     int i;
     int blockid;
 
-    qDebug()<<array->data();
+    //qDebug()<<array->data();
 
-    blockidlist.clear();
+
     if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'C')
     {
+        blockidlist_cam1.clear();
         len = array->at(4);
-        qDebug() << "len =" << len;
+        //qDebug() << "ca1 len =" << len;
 
         for(i = 0; i < (int)len; i ++)
         {
             blockid = (int)(array->at(5 + i));
-            blockidlist.append(blockid);
-            qDebug() << i << blockid;
+            blockidlist_cam1.append(blockid);
+            //qDebug() << i << blockid;
         }
         doprocessimage = 1;
-        emit processImg(blockid);
-    }else if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'D')
+        emit processImg_cam1(blockid);
+    }else if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'B')
+    {
+        blockidlist_cam2.clear();
+        len = array->at(4);
+        //qDebug() << "ca2 len =" << len;
+
+        for(i = 0; i < (int)len; i ++)
+        {
+            blockid = (int)(array->at(5 + i));
+            blockidlist_cam2.append(blockid);
+            //qDebug() << i << blockid;
+        }
+        doprocessimage = 1;
+        emit processImg_cam2(blockid);
+    }
+    else if(array->at(0) == 'S' && array->at(1) == '8' && array->at(2) == '4' && array->at(3) == 'D')
     {
         int  code= array->at(4) + (array->at(5) << 8) + (array->at(6) << 16) + (array->at(7) << 24) ;
         emit loadPatternFile(code);

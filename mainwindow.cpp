@@ -5,10 +5,12 @@
 #include <QMessageBox>
 #include <QPixmap>
 #include <algorithm/match_util.h>
+#include <imageproc.h>
 #include "util.h"
 #include "patternfile.h"
 #include "thsettingdialog.h"
-
+#include <windows.h>
+#include <dbt.h>
 static void getRgbAndGray(QImage image,int depth,int &r,int &g,int &b,int &gray)
 {
     uint tempR = 0;
@@ -52,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("FCTDEMO");
+    this->setWindowTitle("FCT V1.0");
     dialog.setWindowTitle("Threshold setting");
 
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF-8"));
@@ -73,11 +75,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->tableWidget->setEditTriggers (QAbstractItemView::NoEditTriggers);
 
     ui->camButton->setCheckable(true);
+    ui->camButton_2->setCheckable(true);
     ui->picButton->setCheckable(true);
     ui->calibrationButton->setCheckable(true);
     ui->camButton->setChecked(true);
 
     group.addButton(ui->camButton,CAM_CAP);
+    group.addButton(ui->camButton_2,CAM2_CAP);
     group.addButton(ui->picButton,PIC_CAP);
     group.addButton(ui->calibrationButton,CALI_CAP);
 
@@ -94,7 +98,16 @@ MainWindow::MainWindow(QWidget *parent) :
     tcpworker->listenSocket->listen(QHostAddress::AnyIPv4, 15555);
     tcpworker->start();
 
+    dhcamera  = new DHCamera;
     cuscamera = new CusCamera();
+    cuscamera->dhcamera = dhcamera;
+
+#ifdef USBCHECK
+    keyTimer = new QTimer();
+    keyTimer->setInterval(1000);
+    keyTimer->start();
+    connect(keyTimer, SIGNAL(timeout()), this, SLOT(usbkeyCheck()));
+#endif
 
     connect(ui->label_2, SIGNAL(ListChanged(QMap<int, CusRect>,QMap<int, QString>)), this, SLOT(CusRectListChanged(QMap<int, CusRect>,QMap<int, QString>)));
     connect(ui->addButton, SIGNAL(toggled(bool)), this, SLOT(AddClick(bool)));
@@ -103,9 +116,10 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->recButton, SIGNAL(clicked()), this, SLOT(RecogClick()));
     connect(ui->delButton, SIGNAL(clicked()), this, SLOT(DelClick()));
     connect(ui->captureButton,SIGNAL(clicked()), this, SLOT(detectClick()));
-    connect(cuscamera, SIGNAL(capRdy()), this, SLOT(capimg()));
+    connect(dhcamera, SIGNAL(capRdy()), this, SLOT(capimg()));
     connect(cuscamera, SIGNAL(camInitRdy(int)), this, SLOT(camInitRdy(int)));
-    connect(tcpworker, SIGNAL(processImg(int)), this, SLOT(proecssBlock(int)));
+    connect(tcpworker, SIGNAL(processImg_cam1(int)), this, SLOT(proecssBlock_cam1(int)));
+    connect(tcpworker, SIGNAL(processImg_cam2(int)), this, SLOT(proecssBlock_cam2(int)));
     connect(tcpworker,SIGNAL(loadPatternFile(int)),this,SLOT(loadPatternFile(int)));
     connect(tcpworker,SIGNAL(selectImageSrc(int)),this,SLOT(selectImageSrc(int)));
     connect(tcpworker,SIGNAL(changeImage(int)),this,SLOT(changeImage(int)));
@@ -116,11 +130,14 @@ MainWindow::MainWindow(QWidget *parent) :
 
     cuscamera->start();
     statusBar()->addWidget( statusLabel = new QLabel("正在打开摄像机 "));
-    statusBar()->addWidget( statusLabel_ = new QLabel("流程文件：未选择"));
+    statusBar()->addWidget( statusLabel_ = new QLabel("流程文件：未选择 "));
+    statusBar()->addWidget( statusLabel_key = new QLabel(""));
     statusBar()->setContentsMargins(6,0,0,0);
     statusLabel_->setContentsMargins(6,0,0,0);
+    statusLabel_key->setContentsMargins(6,0,0,0);
     ui->camButton->setEnabled(false);
     ui->picButton->setEnabled(false);
+    ui->camButton_2->setEnabled(false);
     ui->calibrationButton->setEnabled(false);
 
 //    addOp(QPainter::CompositionMode_SourceOver, tr("SourceOver"));
@@ -150,6 +167,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->setVisible(false);
 
     mode = QPainter::CompositionMode_Difference;
+
+    usbDetectInit();
 
 }
 
@@ -194,12 +213,25 @@ MainWindow::~MainWindow()
 void MainWindow::updateStatusBar(int res)
 {
     QString val ;
-    if(capID == CAM_CAP){
+    if(capID == CAM_CAP || capID == CAM2_CAP){
         if(res == FAIL){
             val.append("打开摄像机失败 ");
         }else{
-            val.append("图像来源：摄像机 分辨率："+QString::number(cuscamera->imageproc->m_nImageWidth)+"x"+QString::number(cuscamera->imageproc->m_nImageHeight));
-        }
+            if(dhcamera->currentID == 0)
+            {
+                val.append("图像来源：摄像机1 分辨率："
+                           +QString::number(dhcamera->camdata[0]->width)+"x"+
+                           QString::number(dhcamera->camdata[0]->height));
+                qDebug()<<"cam 0";
+            }else if(dhcamera->currentID == 1)
+            {
+                val.append("图像来源：摄像机2 分辨率："
+                           +QString::number(dhcamera->camdata[1]->width)+"x"+
+                           QString::number(dhcamera->camdata[1]->height));
+                qDebug()<<"cam 1";
+            }
+    }
+
     }else if(capID == PIC_CAP){
         if(res == FAIL){
             val.append("未选择本地图片 ");
@@ -210,7 +242,7 @@ void MainWindow::updateStatusBar(int res)
         if(res == FAIL){
             val.append("未选择校准图片 ");
         }else{
-            val.append("摄像机校准中");
+            val.append("摄像机校准中 ");
         }
     }
     statusLabel->setText(val);
@@ -221,7 +253,7 @@ void MainWindow::updateStatusBar()
     QString val  ;
     QString  path = ui->label_2->getRegular()->pattenPath;
     if(path.length() == 0){
-        val.append("流程文件：未选择");
+        val.append("流程文件：未选择 ");
     }else{
         val.append("流程文件:"+path);
     }
@@ -232,7 +264,23 @@ void MainWindow::camSelect(int id)
 {
     if(id == CAM_CAP){
         capID = CAM_CAP;
-        if(cuscamera->isFinished()){
+        dhcamera->currentID = 0;
+        if(!cuscamera->flag){
+            statusLabel->setText("正在打开摄像机 ");
+            ui->camButton->setEnabled(false);
+            ui->picButton->setEnabled(false);
+            ui->calibrationButton->setEnabled(false);
+            cuscamera->start();
+        }else{
+            updateStatusBar(SUCCESS);
+        }
+
+        ui->label_2->changeRegular(dhcamera->currentID);
+    }else if(id == CAM2_CAP)
+    {
+        capID = CAM_CAP;
+        dhcamera->currentID = 1;
+        if(!cuscamera->flag){
             statusLabel->setText("正在打开摄像机");
             ui->camButton->setEnabled(false);
             ui->picButton->setEnabled(false);
@@ -241,7 +289,10 @@ void MainWindow::camSelect(int id)
         }else{
             updateStatusBar(SUCCESS);
         }
-    }else if(id == PIC_CAP){
+
+        ui->label_2->changeRegular(dhcamera->currentID);
+    }
+    else if(id == PIC_CAP){
         capID = PIC_CAP;
         QString path = QFileDialog::getOpenFileName(this, tr("选择图片"), TEMPSPATH, tr("Image Files(*.bmp)"));
         if(path.length() == 0) {
@@ -274,7 +325,7 @@ void MainWindow::selectImageSrc(int code)
     {
         capID = CAM_CAP;
         if(cuscamera->isFinished()){
-            statusLabel->setText("正在打开摄像机");
+            statusLabel->setText("正在打开摄像机 ");
             ui->camButton->setEnabled(false);
             ui->picButton->setEnabled(false);
             ui->calibrationButton->setEnabled(false);
@@ -336,6 +387,10 @@ void MainWindow::camInitRdy(int val)
     updateStatusBar(val);
     ui->camButton->setEnabled(true);
     ui->picButton->setEnabled(true);
+    if(dhcamera->cam_num>1)
+    {
+        ui->camButton_2->setEnabled(true);
+    }
     ui->calibrationButton->setEnabled(true);
 }
 
@@ -473,6 +528,12 @@ void MainWindow::RecogClick()
 
 void MainWindow::detectClick()
 {
+#ifdef USBCHECK
+    if(!usbkeyChecker.isValidate())
+    {
+        return;
+    }
+#endif
     QMapIterator<int, CusRect> iter(ui->label_2->getRegular()->recMap);
     int cnt = 0;
 
@@ -542,10 +603,10 @@ void MainWindow::detectClick()
     }
 }
 
-void MainWindow::proecssBlock(int n )
+void MainWindow::proecssBlock_cam1(int n )
 {
     QByteArray array;
-    QVectorIterator<int> viter(tcpworker->blockidlist);
+    QVectorIterator<int> viter(tcpworker->blockidlist_cam1);
 
     uchar totalblock = 0;
     int blockid;
@@ -557,15 +618,42 @@ void MainWindow::proecssBlock(int n )
     array.append((char *)&totallen, sizeof(totallen));
     array.append((char *)&totallen, sizeof(totallen));
 
-    CusRect cusrec = ui->label_2->getRegular()->transRec;
+    if(dhcamera->cam_num < 1)
+    {
+        int totallen = array.size();
+        *(UINT32 *)(array.data()) = totallen;
+        *(UINT32 *)(array.data()+4) = 0;
+        *(UINT32 *)(array.data()+8) = 0;
+        *(UINT32 *)(array.data()+12) = 0;
+        tcpworker->doprocessimage = 0;
+        tcpworker->sendCmd(array.data(), array.size());
+        return;
+    }
+#ifdef USBCHECK
+    if(!usbkeyChecker.isValidate() )
+    {
+        qDebug()<<"usbkey invalidate";
+        int totallen = array.size();
+        *(UINT32 *)(array.data()) = totallen;
+        *(UINT32 *)(array.data()+4) = 0;
+        *(UINT32 *)(array.data()+8) = 0;
+        *(UINT32 *)(array.data()+12) = 0;
+        tcpworker->doprocessimage = 0;
+        tcpworker->sendCmd(array.data(), array.size());
+        return;
+    }
+#endif
+
+    CusRect cusrec = ui->label_2->getRegular(0)->transRec;
     QImage srcImage;
+    QImage raw = dhcamera->getImage(0);
     if(cusrec.x1>0.001 && cusrec.x2>0.001 && cusrec.y1>0.001 && cusrec.y2>0.001)
     {
-        QRect rec = cusrec.getRect(image.width(), image.height());
-        srcImage = image.copy(rec);
+        QRect rec = cusrec.getRect(raw.width(), raw.height());
+        srcImage = raw.copy(rec);
         //qDebug()<<"cusrec into";
     }else{
-        srcImage = image;
+        srcImage = raw;
         //qDebug()<<"cusrec no into";
     }
 
@@ -573,13 +661,13 @@ void MainWindow::proecssBlock(int n )
     {
         blockid = viter.next();
 
-        if(ui->label_2->getRegular()->recMap.contains(blockid))
+        if(ui->label_2->getRegular(0)->recMap.contains(blockid))
         {
             CusReplyData  custdata;
-            CusRect rect = ui->label_2->getRegular()->recMap.value(blockid);
-            QRect rec = rect.getRect(image.width(), image.height());
-            QImage temp = image.copy(rec);
-            QString action = ui->label_2->getRegular()->actionMap.value(blockid);
+            CusRect rect = ui->label_2->getRegular(0)->recMap.value(blockid);
+            QRect rec = rect.getRect(raw.width(), raw.height());
+            QImage temp = raw.copy(rec);
+            QString action = ui->label_2->getRegular(0)->actionMap.value(blockid);
             int r,g,b,gray;
             if(action.compare(MATCH_PROC) == 0)
             {
@@ -591,7 +679,7 @@ void MainWindow::proecssBlock(int n )
                     getRgbAndGray(temp,4,r,g,b,gray);
                     pimg.createToGray(temp,4);
                 }
-                PatternFile pa = ui->label_2->getRegular()->tempsMap.value(blockid);
+                PatternFile pa = ui->label_2->getRegular(0)->tempsMap.value(blockid);
 
                 double res = mul_tempRoi(pimg,pa.temps,1,pa.th);
                 if(res > 0.5f)
@@ -611,6 +699,151 @@ void MainWindow::proecssBlock(int n )
                 custdata.replybuffer.b = b;
                 custdata.replybuffer.grayscale = gray;
                 custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f); 
+                pimg.release();
+
+            }
+            else if(action.compare(RECOG_PROC) == 0)
+            {
+                Pic<uchar> pimg;
+
+                if(capID == CAM_CAP){
+                    getRgbAndGray(temp,3,r,g,b,gray);
+                    pimg.createToGray(temp,3);
+                }else if(capID == PIC_CAP){
+                    getRgbAndGray(temp,4,r,g,b,gray);
+                    pimg.createToGray(temp,4);
+                }
+                int predict = cnn->test_Pic(pimg);
+                custdata.replybuffer.number = predict;
+                pimg.release();
+            }
+            custdata.replybuffer.r = r;
+            custdata.replybuffer.g = g;
+            custdata.replybuffer.b = b;
+            custdata.replybuffer.grayscale = gray;
+            custdata.replybuffer.similarity = custdata.replybuffer.similarity % 101;
+            custdata.replybuffer.id = blockid;
+            custdata.replybuffer.width  = temp.width();
+            custdata.replybuffer.height = temp.height();
+            custdata.replybuffer.left   = rec.left();
+            custdata.replybuffer.up     = rec.top();
+            array.append((char *)(&(custdata.replybuffer)), sizeof(custdata.replybuffer));
+            totalblock++;
+        }
+    }
+    uint *src = new uint[srcImage.width()*srcImage.height()];
+    if(capID == CAM_CAP){
+        TUtil::camconvertToRGBA(srcImage,src);
+    }else if(capID == PIC_CAP){
+        TUtil::bmpconvertToRGBA(srcImage,src);
+    }
+    array.append((char *)src,srcImage.width()*srcImage.height()*4);
+    totallen = array.size();
+    *(UINT32 *)(array.data()) = totallen;
+    *(UINT32 *)(array.data()+4) = totalblock;
+    *(UINT32 *)(array.data()+8) = srcImage.width();
+    *(UINT32 *)(array.data()+12) = srcImage.height();
+
+    tcpworker->doprocessimage = 0;
+    tcpworker->sendCmd(array.data(), array.size());
+    delete []src;
+}
+
+void MainWindow::proecssBlock_cam2(int n )
+{
+    QByteArray array;
+    QVectorIterator<int> viter(tcpworker->blockidlist_cam2);
+
+    uchar totalblock = 0;
+    int blockid;
+
+    UINT32 totallen = 0;
+    vect.clear();
+    array.append((char *)&totallen, sizeof(totallen));
+    array.append((char *)&totallen, sizeof(totallen));
+    array.append((char *)&totallen, sizeof(totallen));
+    array.append((char *)&totallen, sizeof(totallen));
+
+    if(dhcamera->cam_num < 2)
+    {
+        int totallen = array.size();
+        *(UINT32 *)(array.data()) = totallen;
+        *(UINT32 *)(array.data()+4) = 0;
+        *(UINT32 *)(array.data()+8) = 0;
+        *(UINT32 *)(array.data()+12) = 0;
+        tcpworker->doprocessimage = 0;
+        tcpworker->sendCmd(array.data(), array.size());
+        return;
+    }
+#ifdef USBCHECK
+    if(!usbkeyChecker.isValidate() )
+    {
+        int totallen = array.size();
+        *(UINT32 *)(array.data()) = totallen;
+        *(UINT32 *)(array.data()+4) = 0;
+        *(UINT32 *)(array.data()+8) = 0;
+        *(UINT32 *)(array.data()+12) = 0;
+        tcpworker->doprocessimage = 0;
+        tcpworker->sendCmd(array.data(), array.size());
+        return;
+    }
+#endif
+
+    CusRect cusrec = ui->label_2->getRegular(1)->transRec;
+    QImage srcImage;
+    QImage raw = dhcamera->getImage(1);
+    if(cusrec.x1>0.001 && cusrec.x2>0.001 && cusrec.y1>0.001 && cusrec.y2>0.001)
+    {
+        QRect rec = cusrec.getRect(raw.width(), raw.height());
+        srcImage = raw.copy(rec);
+        //qDebug()<<"cusrec into";
+    }else{
+        srcImage = raw;
+        //qDebug()<<"cusrec no into";
+    }
+
+    while(viter.hasNext())
+    {
+        blockid = viter.next();
+
+        if(ui->label_2->getRegular(1)->recMap.contains(blockid))
+        {
+            CusReplyData  custdata;
+            CusRect rect = ui->label_2->getRegular(1)->recMap.value(blockid);
+            QRect rec = rect.getRect(raw.width(), raw.height());
+            QImage temp = raw.copy(rec);
+            QString action = ui->label_2->getRegular(1)->actionMap.value(blockid);
+            int r,g,b,gray;
+            if(action.compare(MATCH_PROC) == 0)
+            {
+                Pic<uchar> pimg;
+                if(capID == CAM_CAP){
+                    getRgbAndGray(temp,3,r,g,b,gray);
+                    pimg.createToGray(temp,3);
+                }else if(capID == PIC_CAP){
+                    getRgbAndGray(temp,4,r,g,b,gray);
+                    pimg.createToGray(temp,4);
+                }
+                PatternFile pa = ui->label_2->getRegular(1)->tempsMap.value(blockid);
+
+                double res = mul_tempRoi(pimg,pa.temps,1,pa.th);
+                if(res > 0.5f)
+                {
+                    custdata.replybuffer.state = 0;
+                }
+                else if(res > -0.1f)
+                {
+                    custdata.replybuffer.state = 1;
+                }
+                else
+                {
+                    custdata.replybuffer.state = 0xff;
+                }
+                custdata.replybuffer.r = r;
+                custdata.replybuffer.g = g;
+                custdata.replybuffer.b = b;
+                custdata.replybuffer.grayscale = gray;
+                custdata.replybuffer.similarity = 100 - static_cast<int>(res * 100.0f + .5f);
                 pimg.release();
 
             }
@@ -657,9 +890,11 @@ void MainWindow::proecssBlock(int n )
     *(UINT32 *)(array.data()+8) = srcImage.width();
     *(UINT32 *)(array.data()+12) = srcImage.height();
 
+    //qDebug()<<"totalblock "<<totalblock;
+
     tcpworker->doprocessimage = 0;
     tcpworker->sendCmd(array.data(), array.size());
-    delete []src;
+   delete []src;
 }
 
 void MainWindow::loadPatternFile(int code)
@@ -704,12 +939,13 @@ void MainWindow::tcpstartrw()
 void MainWindow::capimg()
 {
     if(capID == CAM_CAP){
-        image = cuscamera->imageproc->getImg();
+        //qDebug()<<"capimg";
+        image = dhcamera->getImage();
         ui->label_2->setPixmap(QPixmap::fromImage(image.scaled(ui->label_2->width(),ui->label_2->height())));
     }else if(capID == CALI_CAP)
     {
         if(caliFlag){
-            image = cuscamera->imageproc->getImg();
+//            image = cuscamera->imageproc->getImg();
             QPixmap input1 = caliImage.scaled(ui->label_2->width(),ui->label_2->height());
             QPixmap output1(input1.size());
             output1.fill(Qt::transparent);
@@ -736,8 +972,8 @@ void MainWindow::capimg()
             painter.end();
             ui->label_2->setPixmap(baseImg);
         }else{
-            image = cuscamera->imageproc->getImg();
-            ui->label_2->setPixmap(QPixmap::fromImage(image.scaled(ui->label_2->width(),ui->label_2->height())));
+//            image = cuscamera->imageproc->getImg();
+//            ui->label_2->setPixmap(QPixmap::fromImage(image.scaled(ui->label_2->width(),ui->label_2->height())));
         }
     }
 }
@@ -779,6 +1015,103 @@ void MainWindow::on_loadFileButton_clicked()
         CusRectListChanged(ui->label_2->getRegular()->recMap,ui->label_2->getRegular()->actionMap);
         updateStatusBar();
     }
+}
+
+void MainWindow::usbkeyCheck()
+{
+    usbkeyChecker.check();
+    if(!usbkeyChecker.isValidate())
+    {
+        statusLabel_key->setText("未插入USB加密狗");
+        QPalette pa;
+        pa.setColor(QPalette::WindowText,Qt::red);
+        statusLabel_key->setPalette(pa);
+    }else{
+        statusLabel_key->setText("已插入USB加密狗");
+        QPalette pa;
+        pa.setColor(QPalette::WindowText,Qt::darkGreen);
+        statusLabel_key->setPalette(pa);
+    }
+}
+
+void MainWindow::usbDetectInit()
+{
+    int val = 0;
+    static const GUID GUID_DEVINTERFACE_LIST[] =
+    {
+        // GUID_DEVINTERFACE_USB_DEVICE
+        { 0xA5DCBF10, 0x6530, 0x11D2,{ 0x90, 0x1F, 0x00, 0xC0, 0x4F, 0xB9, 0x51, 0xED } },
+        // GUID_DEVINTERFACE_DISK
+        //{ 0x53f56307, 0xb6bf, 0x11d0,{ 0x94, 0xf2, 0x00, 0xa0, 0xc9, 0x1e, 0xfb, 0x8b } },
+        // GUID_DEVINTERFACE_HID,
+        { 0x4D1E55B2, 0xF16F, 0x11CF,{ 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30 } },
+        // GUID_NDIS_LAN_CLASS
+        //{ 0xad498944, 0x762f, 0x11d0,{ 0x8d, 0xcb, 0x00, 0xc0, 0x4f, 0xc3, 0x35, 0x8c } }
+        //// GUID_DEVINTERFACE_COMPORT
+        //{ 0x86e0d1e0, 0x8089, 0x11d0, { 0x9c, 0xe4, 0x08, 0x00, 0x3e, 0x30, 0x1f, 0x73 } },
+        //// GUID_DEVINTERFACE_SERENUM_BUS_ENUMERATOR
+        //{ 0x4D36E978, 0xE325, 0x11CE, { 0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18 } },
+        //// GUID_DEVINTERFACE_PARALLEL
+        //{ 0x97F76EF0, 0xF883, 0x11D0, { 0xAF, 0x1F, 0x00, 0x00, 0xF8, 0x00, 0x84, 0x5C } },
+        //// GUID_DEVINTERFACE_PARCLASS
+        //{ 0x811FC6A5, 0xF728, 0x11D0, { 0xA5, 0x37, 0x00, 0x00, 0xF8, 0x75, 0x3E, 0xD1 } }
+    };
+
+    //注册插拔事件
+    HDEVNOTIFY hDevNotify;
+    DEV_BROADCAST_DEVICEINTERFACE NotifacationFiler;
+    ZeroMemory(&NotifacationFiler, sizeof(DEV_BROADCAST_DEVICEINTERFACE));
+    NotifacationFiler.dbcc_size = sizeof(DEV_BROADCAST_DEVICEINTERFACE);
+    NotifacationFiler.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+
+    for (int i = 0; i < sizeof(GUID_DEVINTERFACE_LIST) / sizeof(GUID); i++)
+    {
+        NotifacationFiler.dbcc_classguid = GUID_DEVINTERFACE_LIST[i];//GetCurrentUSBGUID();//m_usb->GetDriverGUID();
+
+        hDevNotify = RegisterDeviceNotification((HANDLE)this->winId(), &NotifacationFiler, DEVICE_NOTIFY_WINDOW_HANDLE);
+        if (!hDevNotify)
+        {
+//            int Err = GetLastError();
+            val = -1;
+        }
+    }
+}
+
+bool MainWindow::nativeEvent(const QByteArray & eventType, void * message, long *result)
+{
+
+    Q_UNUSED(eventType);
+    QString DevPathName;
+    MSG* msg = reinterpret_cast<MSG*>(message);
+    int msgType = msg->message;
+    if (msgType == WM_DEVICECHANGE)
+    {
+
+        PDEV_BROADCAST_DEVICEINTERFACE lpdb = (PDEV_BROADCAST_DEVICEINTERFACE)msg->lParam;
+        switch (msg->wParam)
+        {
+        case DBT_DEVICEARRIVAL:   // usb insert
+
+            if (lpdb->dbcc_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+            {
+
+                DevPathName = QString::fromWCharArray(lpdb->dbcc_name); // wchar* to QString
+                usbkeyChecker.checkable = true;
+            }
+            break;
+        case DBT_DEVICEREMOVECOMPLETE:    // usb remove
+
+            if (lpdb->dbcc_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+            {
+                DevPathName = QString::fromWCharArray(lpdb->dbcc_name); // wchar* to QString
+                 usbkeyChecker.checkable = true;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+     return false;
 }
 
 

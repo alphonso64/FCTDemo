@@ -1,8 +1,8 @@
 ﻿#ifndef CUSCAMERA_H
 #define CUSCAMERA_H
-#include "imageproc.h"
 #include <QThread>
 #include <QTimer>
+#include "dhcamera.h"
 class CusCamera: public QThread
 {
     Q_OBJECT
@@ -12,17 +12,16 @@ public:
     {
 
     }
+
 protected:
     void run();
 private slots:
-    void timeOut();
 signals:
-    void capRdy();
     void camInitRdy(int);
 public:
-    ImageProc *imageproc;
+    DHCamera *dhcamera;
+    bool flag;
 private:
-    QTimer *timer;
 
 };
 

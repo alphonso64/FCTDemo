@@ -6,7 +6,9 @@ CusLabel::CusLabel(QWidget *parent):QLabel(parent)
     drawflag = false;
     trans_startflag = false;
     trans_drawflag = false;
-    regular = new Regular();
+    regular_list[0] = new Regular();
+    regular_list[1] = new Regular();
+    regular = regular_list[0];
 }
 
 CusLabel::CusLabel()
@@ -15,7 +17,9 @@ CusLabel::CusLabel()
     drawflag = false;
     trans_startflag = false;
     trans_drawflag = false;
-    regular = new Regular();
+    regular_list[0] = new Regular();
+    regular_list[1] = new Regular();
+    regular = regular_list[0];
 }
 
 void CusLabel::enableRect()
@@ -167,4 +171,16 @@ Regular* CusLabel::getRegular()
 {
     return regular;
 }
+
+Regular* CusLabel::getRegular(int index)
+{
+    return regular_list[index];
+}
+
+void CusLabel::changeRegular(int index)
+{
+    regular = regular_list[index];
+    emit ListChanged(regular->recMap,regular->actionMap);
+}
+
 

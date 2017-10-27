@@ -112,7 +112,7 @@
                  <rect>
                   <x>15</x>
                   <y>10</y>
-                  <width>91</width>
+                  <width>41</width>
                   <height>31</height>
                  </rect>
                 </property>
@@ -126,7 +126,7 @@ QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid 
 QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}</string>
                 </property>
                 <property name="text">
-                 <string>摄像头</string>
+                 <string>CAM1</string>
                 </property>
                </widget>
                <widget class="QPushButton" name="picButton">
@@ -165,6 +165,28 @@ QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid
                 </property>
                 <property name="text">
                  <string>校准</string>
+                </property>
+               </widget>
+               <widget class="QPushButton" name="camButton_2">
+                <property name="geometry">
+                 <rect>
+                  <x>65</x>
+                  <y>10</y>
+                  <width>41</width>
+                  <height>31</height>
+                 </rect>
+                </property>
+                <property name="focusPolicy">
+                 <enum>Qt::ClickFocus</enum>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">QPushButton:checked{background-color: rgba(38, 166, 154,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}
+QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}
+QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}
+QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}</string>
+                </property>
+                <property name="text">
+                 <string>CAM2</string>
                 </property>
                </widget>
               </widget>
@@ -396,8 +418,6 @@ QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid 
                  <string>检测</string>
                 </property>
                </widget>
-               <zorder>captureButton</zorder>
-               <zorder>comboBox</zorder>
               </widget>
               <widget class="QComboBox" name="comboBox">
                <property name="geometry">

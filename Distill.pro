@@ -12,13 +12,15 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Distill
 TEMPLATE = app
 
+DEFINES += QT_NO_WARNING_OUTPUT\
+                  QT_NO_DEBUG_OUTPUT
+
 QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
 #DEFINES += QT_NO_WARNING_OUTPUT\ QT_NO_DEBUG_OUTPUT
-
+RC_ICONS = icon.ico
 SOURCES += main.cpp\
         mainwindow.cpp \
     CusRect.cpp \
-    imageproc.cpp \
     paintlabel.cpp \
     tcprwworker.cpp \
     cuscamera.cpp \
@@ -39,11 +41,12 @@ SOURCES += main.cpp\
     util.cpp \
     regular.cpp \
     patternfile.cpp \
-    thsettingdialog.cpp
+    thsettingdialog.cpp \
+    dhcamera.cpp \
+    usbkeychecker.cpp
 
 HEADERS  += mainwindow.h \
     CusRect.h \
-    imageproc.h \
     paintlabel.h \
     tcprwworker.h \
     DxImageProc.h \
@@ -71,10 +74,18 @@ HEADERS  += mainwindow.h \
     util.h \
     regular.h \
     patternfile.h \
-    thsettingdialog.h
+    thsettingdialog.h \
+    dhcamera.h \
+    imageproc.h \
+    usbkeychecker.h \
+    hasp_api.h
 
 FORMS    += mainwindow.ui \
     thsettingdialog.ui
 
 LIBS+=D:/lib/x86/GxIAPI.lib
 LIBS+=D:/lib/x86/DxImageProc.lib
+LIBS+=D:/lib/x86/hasp_windows_demo.lib
+LIBS += -luser32
+
+
