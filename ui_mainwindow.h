@@ -50,6 +50,7 @@ public:
     QPushButton *camButton;
     QPushButton *picButton;
     QPushButton *calibrationButton;
+    QPushButton *camButton_2;
     QGroupBox *groupBox_2;
     QPushButton *loadFileButton;
     QPushButton *saveFileButton;
@@ -150,7 +151,7 @@ public:
         groupBox->setStyleSheet(QStringLiteral(""));
         camButton = new QPushButton(groupBox);
         camButton->setObjectName(QStringLiteral("camButton"));
-        camButton->setGeometry(QRect(15, 10, 91, 31));
+        camButton->setGeometry(QRect(15, 10, 41, 31));
         camButton->setFocusPolicy(Qt::ClickFocus);
         camButton->setStyleSheet(QLatin1String("QPushButton:checked{background-color: rgba(38, 166, 154,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
 "QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
@@ -167,6 +168,14 @@ public:
         calibrationButton->setObjectName(QStringLiteral("calibrationButton"));
         calibrationButton->setGeometry(QRect(15, 90, 91, 31));
         calibrationButton->setStyleSheet(QLatin1String("QPushButton:checked{background-color: rgba(38, 166, 154,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
+"QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}"));
+        camButton_2 = new QPushButton(groupBox);
+        camButton_2->setObjectName(QStringLiteral("camButton_2"));
+        camButton_2->setGeometry(QRect(65, 10, 41, 31));
+        camButton_2->setFocusPolicy(Qt::ClickFocus);
+        camButton_2->setStyleSheet(QLatin1String("QPushButton:checked{background-color: rgba(38, 166, 154,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
 "QPushButton{background-color: rgba(84, 110, 122,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
 "QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}\n"
 "QPushButton:disabled{background-color: rgba(0, 77, 64,  255);  border: 1px solid rgb(124, 124, 124); border-radius:5px;}"));
@@ -227,7 +236,6 @@ public:
         captureButton->setObjectName(QStringLiteral("captureButton"));
         captureButton->setGeometry(QRect(10, 10, 101, 41));
         captureButton->setFont(font);
-        captureButton->raise();
         comboBox = new QComboBox(widget_2);
         comboBox->setObjectName(QStringLiteral("comboBox"));
         comboBox->setGeometry(QRect(30, 530, 81, 20));
@@ -267,9 +275,10 @@ public:
         label_2->setText(QString());
         label->setText(QString());
         groupBox->setTitle(QString());
-        camButton->setText(QApplication::translate("MainWindow", "\346\221\204\345\203\217\345\244\264", Q_NULLPTR));
+        camButton->setText(QApplication::translate("MainWindow", "CAM1", Q_NULLPTR));
         picButton->setText(QApplication::translate("MainWindow", "\345\233\276\347\211\207", Q_NULLPTR));
         calibrationButton->setText(QApplication::translate("MainWindow", "\346\240\241\345\207\206", Q_NULLPTR));
+        camButton_2->setText(QApplication::translate("MainWindow", "CAM2", Q_NULLPTR));
         groupBox_2->setTitle(QString());
         loadFileButton->setText(QApplication::translate("MainWindow", "\350\275\275\345\205\245\346\265\201\347\250\213\346\226\207\344\273\266", Q_NULLPTR));
         saveFileButton->setText(QApplication::translate("MainWindow", "\344\277\235\345\255\230\346\265\201\347\250\213\346\226\207\344\273\266", Q_NULLPTR));

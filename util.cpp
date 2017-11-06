@@ -27,7 +27,7 @@ void TUtil::bmpconvertToRGBA(QImage image, uint *dst)
         }
     }
 }
-
+#ifdef USBCHECK
 int TUtil::checkUSBKEY()
 {
     int val = 0;
@@ -78,7 +78,7 @@ int TUtil::checkUSBKEY()
     return val;
 
 }
-
+#endif
 void TUtil::camconvertToRGBA(QImage image, uint *dst)
 {
     int temp = 0;

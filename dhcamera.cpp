@@ -180,10 +180,7 @@ int DHCamera::openDevice()
     for(int i=0;i<cam_num;i++)
     {
         camdata[i] = new CamData;
-    }
 
-    for(int i=0;i<cam_num;i++)
-    {
         char      index[10]    = {0};
         GX_OPEN_PARAM open_param;
         open_param.accessMode = GX_ACCESS_EXCLUSIVE;
@@ -197,6 +194,10 @@ int DHCamera::openDevice()
         {
             return FAIL;
         }
+    }
+
+    for(int i=0;i<cam_num;i++)
+    {
 
         emStatus = GXSetEnum(camdata[i]->m_device,GX_ENUM_ACQUISITION_MODE, GX_ACQ_MODE_CONTINUOUS);
         if(emStatus != GX_STATUS_SUCCESS)

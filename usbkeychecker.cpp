@@ -15,7 +15,7 @@ bool USBKEYChecker::isValidate()
     return validate;
 }
 
-
+#ifdef USBCHECK
 void USBKEYChecker::check()
 {
     if(checkable != false)
@@ -39,6 +39,7 @@ void USBKEYChecker::check()
     }
 
 }
+#endif
 
 
 

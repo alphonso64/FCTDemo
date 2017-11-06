@@ -9,8 +9,10 @@
 #include "util.h"
 #include "patternfile.h"
 #include "thsettingdialog.h"
+#ifdef USBCHECK
 #include <windows.h>
 #include <dbt.h>
+#endif
 static void getRgbAndGray(QImage image,int depth,int &r,int &g,int &b,int &gray)
 {
     uint tempR = 0;
@@ -167,8 +169,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->comboBox->setVisible(false);
 
     mode = QPainter::CompositionMode_Difference;
-
+#ifdef USBCHECK
     usbDetectInit();
+#endif
 
 }
 
@@ -1016,7 +1019,7 @@ void MainWindow::on_loadFileButton_clicked()
         updateStatusBar();
     }
 }
-
+#ifdef USBCHECK
 void MainWindow::usbkeyCheck()
 {
     usbkeyChecker.check();
@@ -1113,5 +1116,5 @@ bool MainWindow::nativeEvent(const QByteArray & eventType, void * message, long 
     }
      return false;
 }
-
+#endif
 

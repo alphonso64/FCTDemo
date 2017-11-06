@@ -54,7 +54,9 @@ private slots:
     void on_loadFileButton_clicked();
     void changeMode();
     void dialogdone(int);
+#ifdef  USBCHECK
     void usbkeyCheck();
+#endif
 private:
     void initNet();
     void send2Client();
@@ -62,8 +64,11 @@ private:
     void updateStatusBar(int state);
     void updateStatusBar();
     void addOp(QPainter::CompositionMode mode, const QString &name);
+#ifdef  USBCHECK
     bool nativeEvent(const QByteArray & eventType, void * message, long *result);
     void usbDetectInit();
+#endif
+
 
     Ui::MainWindow *ui;
     int capID;
