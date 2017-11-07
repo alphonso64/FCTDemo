@@ -13,7 +13,6 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QComboBox>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QHeaderView>
@@ -64,7 +63,6 @@ public:
     QPushButton *addTransButton;
     QGroupBox *groupBox_4;
     QPushButton *captureButton;
-    QComboBox *comboBox;
     QStatusBar *statusBar;
 
     void setupUi(QMainWindow *MainWindow)
@@ -236,9 +234,6 @@ public:
         captureButton->setObjectName(QStringLiteral("captureButton"));
         captureButton->setGeometry(QRect(10, 10, 101, 41));
         captureButton->setFont(font);
-        comboBox = new QComboBox(widget_2);
-        comboBox->setObjectName(QStringLiteral("comboBox"));
-        comboBox->setGeometry(QRect(30, 530, 81, 20));
 
         verticalLayout->addWidget(widget_2);
 

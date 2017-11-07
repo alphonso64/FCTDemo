@@ -194,7 +194,7 @@ FCTCLIENT_API int start(int num, char * buf)
 	return 0;
 }
 
-FCTCLIENT_API int start(int num, char * buf,int camIndex)
+FCTCLIENT_API int start_cam(int num, char * buf,int camIndex)
 {
 	
 	isprocessfinished = 0;
@@ -220,6 +220,13 @@ FCTCLIENT_API int start(int num, char * buf,int camIndex)
 	{
 		char cmd[] = "S84B";
 		memcpy(sendBuf, cmd, 4);
+	}else if(camIndex == 3)
+	{
+		char cmd[] = "S84A";
+		memcpy(sendBuf, cmd, 4);
+	}
+	else{
+		return -1;
 	}
 
 	
@@ -264,7 +271,7 @@ FCTCLIENT_API int selectimagesrc(int id)
 	return ret;
 }
 
-FCTCLIENT_API int changeimage(int id)
+FCTCLIENT_API int changeimage(int len,char *path)
 {
 	char cmd[] = "S84F";
 	if (SOCKET_ERROR == sockfd)
@@ -272,10 +279,11 @@ FCTCLIENT_API int changeimage(int id)
 		return -1;
 	}
 
-	memcpy(sendBuf, cmd, 4);	
-	memcpy(sendBuf + 4, (char *)&id, 4);
+	memcpy(sendBuf, cmd, 4);
+	memcpy(sendBuf + 4, (char *)&len, 4);
+	memcpy(sendBuf + 8, path, len);
 
-	if (-1 == send(sockfd, sendBuf, 8, 0))
+	if (-1 == send(sockfd, sendBuf, 8+len, 0))
 	{
 		closesocket(sockfd);
 		return -1;
@@ -291,7 +299,7 @@ FCTCLIENT_API int changeimage(int id)
 	return ret;
 }
 
-FCTCLIENT_API int loadpatternfile(int code)
+FCTCLIENT_API int loadpatternfile(int srccode,int len,char *path)
 {
 	char cmd[] = "S84D";
 	if (SOCKET_ERROR == sockfd)
@@ -300,10 +308,11 @@ FCTCLIENT_API int loadpatternfile(int code)
 		return -1;
 	}
 
-	memcpy(sendBuf, cmd, 4);	
-	memcpy(sendBuf + 4, (char *)&code, 4);
-
-	if (-1 == send(sockfd, sendBuf, 8, 0))
+	memcpy(sendBuf, cmd, 4);
+	memcpy(sendBuf + 4, (char *)&srccode, 4);
+	memcpy(sendBuf + 8, (char *)&len, 4);
+	memcpy(sendBuf + 12, (char *)path, len);
+	if (-1 == send(sockfd, sendBuf, 12+len, 0))
 	{
 		closesocket(sockfd);
 		return -1;

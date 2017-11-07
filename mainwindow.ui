@@ -419,16 +419,6 @@ QPushButton:pressed{background-color: rgba(0, 77, 64,  255);  border: 1px solid 
                 </property>
                </widget>
               </widget>
-              <widget class="QComboBox" name="comboBox">
-               <property name="geometry">
-                <rect>
-                 <x>30</x>
-                 <y>530</y>
-                 <width>81</width>
-                 <height>20</height>
-                </rect>
-               </property>
-              </widget>
              </widget>
             </item>
            </layout>

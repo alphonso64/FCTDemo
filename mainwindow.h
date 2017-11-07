@@ -15,6 +15,7 @@
 #include "thsettingdialog.h"
 #include <dhcamera.h>
 #include "usbkeychecker.h"
+#include "rotatesettingdialog.h"
 using namespace std;
 
 #pragma execution_character_set("utf-8")
@@ -42,18 +43,20 @@ private slots:
     void ItemActivated( int row,int col);
     void proecssBlock_cam1(int n);
     void proecssBlock_cam2(int n);
+    void proecssBlock_pic(int n);
     void capimg();
     void saveimg();
     void camInitRdy(int);
     void camSelect(int);
     void selectImageSrc(int);
-    void changeImage(int);
-    void loadPatternFile(int);
+    void changeImage(QString);
+    void loadPatternFile(int,QString);
     void on_savePicButton_clicked();
     void on_saveFileButton_clicked();
     void on_loadFileButton_clicked();
     void changeMode();
     void dialogdone(int);
+    void rotatedialogdone(int);
 #ifdef  USBCHECK
     void usbkeyCheck();
 #endif
@@ -86,8 +89,11 @@ private:
     QLabel *statusLabel_key;
     QPainter::CompositionMode mode;
     ThSettingDialog dialog;
+    RotateSettingDialog rotateDialpg;
     USBKEYChecker usbkeyChecker;
     QTimer *keyTimer;
+    QImage picImg;
+    bool picFlag;
 public:
 
 };

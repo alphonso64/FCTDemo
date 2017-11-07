@@ -33,7 +33,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
 
 private:
-    Regular *regular_list[2];
+    Regular *regular_list[3];
     Regular *regular;
     bool startflag;
     bool drawflag;

@@ -8,6 +8,7 @@ CusLabel::CusLabel(QWidget *parent):QLabel(parent)
     trans_drawflag = false;
     regular_list[0] = new Regular();
     regular_list[1] = new Regular();
+    regular_list[2] = new Regular();
     regular = regular_list[0];
 }
 
@@ -19,6 +20,7 @@ CusLabel::CusLabel()
     trans_drawflag = false;
     regular_list[0] = new Regular();
     regular_list[1] = new Regular();
+    regular_list[2] = new Regular();
     regular = regular_list[0];
 }
 

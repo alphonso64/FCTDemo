@@ -20,8 +20,6 @@ public:
 
 private slots:
     void setValue(int value);
-
-
     void on_pushButton_clicked();
 
 private:

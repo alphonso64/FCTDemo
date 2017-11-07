@@ -31,14 +31,16 @@ public:
     volatile int isnewrequest;
     QVector<int>  blockidlist_cam1;
     QVector<int>  blockidlist_cam2;
+    QVector<int>  blockidlist_pic;
 private:
     void processCmd(QByteArray * array);
 signals:
     void processImg_cam1(int id);
     void processImg_cam2(int id);
-    void loadPatternFile(int code);
+    void processImg_pic(int id);
+    void loadPatternFile(int code,QString path);
     void selectImageSrc(int code);
-    void changeImage(int code);
+    void changeImage(QString path);
 };
 
 #endif // TCPRWWORKER_H

@@ -12,8 +12,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = Distill
 TEMPLATE = app
 
-DEFINES += QT_NO_WARNING_OUTPUT\
-                  QT_NO_DEBUG_OUTPUT
+DEFINES += QT_NO_WARNING_OUTPUT QT_NO_DEBUG_OUTPUT
 
 QMAKE_LFLAGS_WINDOWS = /SUBSYSTEM:WINDOWS,5.01
 RC_ICONS = icon.ico
@@ -42,7 +41,8 @@ SOURCES += main.cpp\
     patternfile.cpp \
     thsettingdialog.cpp \
     dhcamera.cpp \
-    usbkeychecker.cpp
+    usbkeychecker.cpp \
+    rotatesettingdialog.cpp
 
 HEADERS  += mainwindow.h \
     CusRect.h \
@@ -77,10 +77,12 @@ HEADERS  += mainwindow.h \
     dhcamera.h \
     imageproc.h \
     usbkeychecker.h \
-    hasp_api.h
+    hasp_api.h \
+    rotatesettingdialog.h
 
 FORMS    += mainwindow.ui \
-    thsettingdialog.ui
+    thsettingdialog.ui \
+    rotatesettingdialog.ui
 
 LIBS+=D:/lib/x86/GxIAPI.lib
 LIBS+=D:/lib/x86/DxImageProc.lib

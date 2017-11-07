@@ -69,13 +69,11 @@ void Regular::update(QString path)
             Pic<uchar> pimg;
             pimg.createToGray(tempImg,4);
             pattern.temps = make_temps(pimg,th);
-//            for(int i=0;i<pattern.temps.size();i++){
-//                if(pattern.temps[i].data!=NULL)
-//                {
-//                    qDebug()<<"pattern.temps"<<pattern.temps[i].data;
-//                }
-//            }
             pimg.release();
+        }else if(action.compare(RECOG_PROC) == 0){
+            int rotate = settings->value("rotate").toInt();
+            pattern.rotate = rotate;
+            qDebug()<<"rotate"<<rotate;
         }
         recMap.insert(id,CusRect(x1,y1,x2,y2));
         actionMap.insert(id,action);
@@ -149,6 +147,10 @@ void Regular::savePatam2File(QString path)
                 image.save(path+"/"+pattern.name);
                 settings->setValue("th",pattern.th);
                 settings->setValue("temp",  pattern.name);
+            }else if(action.compare(RECOG_PROC)==0)
+            {
+                PatternFile pattern = tempsMap.value(iter.key());
+                settings->setValue("rotate",pattern.rotate);
             }
         }
     }

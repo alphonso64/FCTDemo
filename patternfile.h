@@ -11,6 +11,7 @@ class PatternFile
 public:
     PatternFile();
     int th;
+    int rotate;
     QString path;
     QString name;
     void selfRelease();

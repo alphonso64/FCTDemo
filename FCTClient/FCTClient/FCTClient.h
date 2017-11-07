@@ -23,10 +23,10 @@ extern FCTCLIENT_API int nFCTClient;
 FCTCLIENT_API int fnFCTClient(void);
 FCTCLIENT_API int connect2host();
 FCTCLIENT_API int start(int num, char * buf);
-FCTCLIENT_API int start(int num, char * buf,int camIndex);
-FCTCLIENT_API int loadpatternfile(int code);
+FCTCLIENT_API int start_cam(int num, char * buf,int camIndex);
+FCTCLIENT_API int loadpatternfile(int code,int len,char *path);
 FCTCLIENT_API int check();
 FCTCLIENT_API int getresult(int * result, int *pimg);
 FCTCLIENT_API int selectimagesrc(int id);//cam--0 pic--1
-FCTCLIENT_API int changeimage(int id);//cam--0 pic--1
+FCTCLIENT_API int changeimage(int len,char *path);//cam--0 pic--1
 FCTCLIENT_API int getimagesize(int *w,int *h);

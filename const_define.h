@@ -11,10 +11,10 @@
 #define SUCCESS 0
 #define FAIL -1
 
-#define USBCHECK
+//#define USBCHECK
 #define USB_CHECK_MAX_CNT 3
 
-//#define LOCALTEST
+#define LOCALTEST
 
 #ifdef LOCALTEST
 #define LAYER_1_KERNEL "D:\\test1\\conv_layer1_kernel.txt"

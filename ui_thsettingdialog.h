@@ -55,7 +55,7 @@ public:
         label_2->setStyleSheet(QStringLiteral(""));
         label_3 = new QLabel(ThSettingDialog);
         label_3->setObjectName(QStringLiteral("label_3"));
-        label_3->setGeometry(QRect(570, 150, 61, 61));
+        label_3->setGeometry(QRect(560, 150, 71, 61));
         label_3->setFont(font);
         label_3->setStyleSheet(QStringLiteral(""));
         pushButton = new QPushButton(ThSettingDialog);

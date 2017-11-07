@@ -25,6 +25,9 @@ public:
 	void create(int col,int row,int channel);
 	void create(m_size size);
     void createToGray(QImage image,int depth);
+    void createToRotate90(Pic image);
+    void createToRotate180(Pic image);
+    void createToRotate270(Pic image);
 	void release();
 	void all(T num=0);
 	void min_max(T& min, T& max, m_point& minPoint, m_point& maxPoint);
@@ -80,6 +83,60 @@ void Pic<T>::createToGray(QImage image,int depth)
             T gray = (T)qGray(*rgbpixel);
             data[ii*step+jj] =gray;
 
+        }
+    }
+}
+template<typename T>
+void Pic<T>::createToRotate90(Pic image)
+{
+    data=new T[image.cols*image.rows];
+    uchar *src_temp = data;
+    step=image.rows;
+    rows=image.cols;
+    cols=image.rows;
+    channels=1;
+    for (int ii = 0; ii < image.cols; ii++) {
+        uchar* scan = image.data+image.cols*(image.rows-1)+ii;
+        for (int jj = 0; jj < image.rows; jj++) {
+            *src_temp = *scan;
+            src_temp++;
+            scan -= image.cols;
+        }
+    }
+}
+template<typename T>
+void Pic<T>::createToRotate180(Pic image)
+{
+    data=new T[image.cols*image.rows];
+    uchar *src_temp = data;
+    step=image.cols;
+    rows=image.rows;
+    cols=image.cols;
+    channels=1;
+    for (int ii = 0; ii < image.rows; ii++) {
+        uchar* scan = image.data+image.cols*(image.rows-ii);;
+        for (int jj = 0; jj < image.cols; jj++) {
+            *src_temp = *scan;
+            src_temp++;
+            scan--;
+        }
+    }
+}
+template<typename T>
+void Pic<T>::createToRotate270(Pic image)
+{
+    data=new T[image.cols*image.rows];
+    uchar *src_temp = data;
+    step=image.rows;
+    rows=image.cols;
+    cols=image.rows;
+    channels=1;
+    for (int ii = 0; ii < image.cols; ii++) {
+        uchar* scan = image.data+image.cols-1-ii;
+        for (int jj = 0; jj < image.rows; jj++) {
+            *src_temp = *scan;
+            src_temp++;
+            scan += image.cols;
         }
     }
 }
